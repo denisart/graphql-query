@@ -1,6 +1,6 @@
 # GraphQL-Query
 
-[![Build](https://img.shields.io/github/checks-status/denisart/graphql-query/master)](https://github.com/denisart/graphql2python/actions)
+[![Build](https://img.shields.io/github/workflow/status/denisart/graphql-query/Code%20checking)](https://github.com/denisart/graphql-query/actions)
 [![tag](https://img.shields.io/github/v/tag/denisart/graphql-query)](https://github.com/denisart/graphql-query)
 [![last-commit](https://img.shields.io/github/last-commit/denisart/graphql-query/master)](https://github.com/denisart/graphql-query/commits/master)
 [![license](https://img.shields.io/github/license/denisart/graphql-query)](https://github.com/denisart/graphql-query/blob/master/LICENSE)

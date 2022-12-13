@@ -6,7 +6,7 @@
 Welcome to graphql_query's documentation!
 ===================================
 
-.. image:: https://img.shields.io/github/checks-status/denisart/graphql-query/master
+.. image:: https://img.shields.io/github/workflow/status/denisart/graphql-query/Code%20checking
   :alt: Build
 .. image:: https://img.shields.io/github/v/tag/denisart/graphql-query
   :alt: tag
