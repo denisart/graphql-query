@@ -1,7 +1,7 @@
 # GraphQL-Query
 
 **graphql_query** is python classes for generate of GraphQL queries.
-The documentation for **graphql_query** can be found at [https://denisart.github.io/graphql2python](https://denisart.github.io/graphql_query).
+The documentation for **graphql_query** can be found at [https://denisart.github.io/graphql_query](https://denisart.github.io/graphql_query).
 
 ## Quickstart
 
