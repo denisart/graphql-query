@@ -8,18 +8,6 @@ from pydantic import BaseModel
 from pydantic import Field as PydanticField
 from pydantic import validator
 
-__all__ = [
-    "Variable",
-    "Argument",
-    "Directive",
-    "Field",
-    "InlineFragment",
-    "Fragment",
-    "Query",
-    "Operation",
-]
-
-
 # templates setting for render of classes
 TEMPLATES_FOLDER = Path(os.path.join(os.path.dirname(__file__), "templates/"))
 

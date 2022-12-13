@@ -2,7 +2,7 @@
 
 from .__info__ import __author__, __email__, __license__, __maintainer__
 from .__version__ import __version__
-from .types import *
+from .types import Argument, Directive, Field, Fragment, InlineFragment, Operation, Query, Variable
 
 __all__ = [
     "__version__",
@@ -19,4 +19,3 @@ __all__ = [
     "Query",
     "Operation",
 ]
-
