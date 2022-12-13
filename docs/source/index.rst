@@ -6,7 +6,16 @@
 Welcome to graphql_query's documentation!
 ===================================
 
-**graphql_query** is python classes for generate of GraphQL queries.
+.. image:: https://img.shields.io/github/checks-status/denisart/graphql-query/master
+  :alt: Build
+.. image:: https://img.shields.io/github/v/tag/denisart/graphql-query
+  :alt: tag
+.. image:: https://img.shields.io/github/last-commit/denisart/graphql-query/master
+  :alt: last-commit
+.. image:: https://img.shields.io/github/license/denisart/graphql-query
+  :alt: license
+
+**graphql_query** is python classes for generating GraphQL queries.
 
 Documentation for version:  |version|
 
