@@ -16,6 +16,44 @@ Install with pip
 pip install graphql_query
 ```
 
+### Simple query
+
+Code for simple query
+
+```graphql
+{
+  hero {
+    name
+  }
+}
+```
+
+it is
+
+```python
+from graphql_query import Operation, Query
+
+hero = Query(name="hero", fields=["name"])
+operation = Operation(type="query", queries=[hero])
+
+print(operation.render())
+# query {
+#  hero {
+#    name
+#  }
+# }
+```
+
+The `render` method for the `graphql_query.Operation` object
+just returns the final string with the query. Inside the `fields` array of the `graphql_query.Query` object
+you can use
+
+- `str` (a field name);
+- object of `graphql_query.Field` type;
+- `graphql_query.Fragment` and `graphql_query.InlineFragment`.
+
+### With arguments, variables and directive
+
 For generation of the following query
 
 ```graphql
