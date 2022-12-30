@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to GRAPHQL_QUERY documentation!
-===================================
+=======================================
 
 .. image:: https://img.shields.io/github/actions/workflow/status/denisart/graphql-query/check.yaml
   :alt: Build
@@ -19,6 +19,8 @@ Welcome to GRAPHQL_QUERY documentation!
 
 Documentation for version:  |version|
 
+Source: https://github.com/denisart/graphql-query
+
 Contents
 --------
 
@@ -27,8 +29,4 @@ Contents
 
   intro
   usage
-
-Indices and tables
-==================
-
-* :ref:`modindex`
+  api

@@ -15,13 +15,13 @@ version = '0.0.2'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
+    'sphinxarg.ext',
     'sphinx.ext.autodoc',
-    'sphinx_rtd_theme'
+    'sphinx_rtd_theme',
 ]
 
 templates_path = ['_templates']
 exclude_patterns = []
-
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -33,11 +33,13 @@ html_static_path = ['_static']
 
 # -- AutoDoc configuration -------------------------------------------------
 # autoclass_content = "both"
+
 autodoc_default_options = {
     'members': True,
-    'inherited-members': True,
+    'inherited-members': False,
     'special-members': '__init__',
     'undoc-members': True,
     'show-inheritance': True
 }
+
 autosummary_generate = True

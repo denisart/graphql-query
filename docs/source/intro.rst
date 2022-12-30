@@ -1,12 +1,12 @@
 Introduction
-=======
+============
 
-`GRAPHQL_QUERY`_ is a python package for auto generation of some GraphQL queries and mutations.
+**GRAPHQL_QUERY** is a python package for auto generation of some GraphQL queries and mutations.
 
 Installation
-----
+------------
 
-For install you can to use pip_ with the following command::
+For install you can to use **pip** with the following command::
 
   pip install graphql-query
 
