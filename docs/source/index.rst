@@ -6,8 +6,6 @@
 Welcome to GRAPHQL_QUERY documentation!
 =======================================
 
-.. image:: https://img.shields.io/github/actions/workflow/status/denisart/graphql-query/check.yaml
-  :alt: Build
 .. image:: https://img.shields.io/github/v/tag/denisart/graphql-query
   :alt: tag
 .. image:: https://img.shields.io/github/last-commit/denisart/graphql-query/master
