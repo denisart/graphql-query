@@ -44,23 +44,35 @@ class GraphQL2PythonQuery(BaseModel):
 class Variable(GraphQL2PythonQuery):
     """GraphQL variable type. See https://graphql.org/learn/queries/#variables
 
-    Example:
+    :param name: The name of variable.
+    :type name: str
+    :param type: The GraphQL type of variable.
+    :type type: str
+    :param default: The optional default value for variable.
+    :type default: str or None
+
+    :Example:
+
         The query
 
-        ```
-        query HeroNameAndFriends($episode: Episode = JEDI) {
-          hero(episode: $episode) {
-            name
-            friends {
-              name
+        .. code-block:: python
+
+            '''
+            query HeroNameAndFriends($episode: Episode = JEDI) {
+              hero(episode: $episode) {
+                name
+                friends {
+                  name
+                }
+              }
             }
-          }
-        }
-        ```
+            '''
 
         has the following variable:
 
-        >>> Variable(name="episode", type="Episode", default="JEDI")
+        .. code-block:: python
+
+            episode = Variable(name="episode", type="Episode", default="JEDI")
 
     """
 
@@ -85,53 +97,68 @@ class Variable(GraphQL2PythonQuery):
 class Argument(GraphQL2PythonQuery):
     """GraphQL argument type. See https://graphql.org/learn/queries/#arguments
 
-    Example 1:
+    :param name: The name of an argument.
+    :type name: str
+    :param value: An argument value.
+    :type value: Union[str, Argument, List[Argument], Variable]
+
+    :Example 1:
+
         In the query
 
-        ```
-        {
-          human(id: "1000") {
-            name
-            height(unit: FOOT)
-          }
-        }
-        ```
+        .. code-block:: python
+
+            '''
+            {
+              human(id: "1000") {
+                name
+                height(unit: FOOT)
+              }
+            }
+            '''
 
         we have two arguments
 
-        Argument(name="id", value='"1000"')
-        Argument(name="unit", value='FOOT')
+        .. code-block:: python
 
-    Example 2:
+            arg_id = Argument(name="id", value='"1000"')
+            arg_unit = Argument(name="unit", value='FOOT')
+
+    :Example 2:
+
         In the query
 
-        ```
-        {
-          q(
-            filter1: {
-              filter2: {
-                field1: "value1"
-                field2: VALUE2
+        .. code-block:: python
+
+            '''
+            {
+              q(
+                filter1: {
+                  filter2: {
+                    field1: "value1"
+                     field2: VALUE2
+                   }
+                 }
+              ) {
+                ...
               }
             }
-          ) {
-            ...
-          }
-        }
-        ```
+            '''
 
         we have the argument
 
-        Argument(
-            name="filter1",
-            value=Argument(
-                name="filter2",
-                value=[
-                    Argument(name="field1", value='"value1"'),
-                    Argument(name="field2", value='VALUE2'),
-                ]
+        .. code-block:: python
+
+            filter1 = Argument(
+                name="filter1",
+                value=Argument(
+                    name="filter2",
+                    value=[
+                        Argument(name="field1", value='"value1"'),
+                        Argument(name="field2", value='VALUE2'),
+                    ]
+                )
             )
-        )
 
     """
 
@@ -172,6 +199,42 @@ class Argument(GraphQL2PythonQuery):
 class Directive(GraphQL2PythonQuery):
     """GraphQL directive type. See https://graphql.org/learn/queries/#directives
 
+    :param name: The directive name.
+    :type name: str
+    :param arguments: The directive arguments.
+    :type arguments: List[Argument]
+
+    :Example:
+
+        In the query
+
+        .. code-block:: python
+
+            '''
+            query Hero($episode: Episode, $withFriends: Boolean!) {
+              hero(episode: $episode) {
+                name
+                friends @include(if: $withFriends) {
+                  name
+                }
+              }
+            }
+            '''
+
+        we have a directive
+
+        .. code-block:: python
+
+            Directive(
+                name="include",
+                arguments=[
+                    Argument(
+                        name="if",
+                        value=Variable(name="withFriends", ...)
+                    )
+                ]
+            )
+
     """
 
     name: str
@@ -193,38 +256,53 @@ class Directive(GraphQL2PythonQuery):
 class Field(GraphQL2PythonQuery):
     """GraphQL Field type. See https://graphql.org/learn/queries/#fields
 
+    :param name: Field name.
+    :type name: str
+    :param alias: Field alias.
+    :type alias: str or None
+    :param arguments: All arguments for the field.
+    :type arguments: List[Argument]
+    :param fields: Sub-fields for the field.
+    :type fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
+    :param directives: All field directives.
+    :type directives: List[Directive]
+    :param typename: Add meta field __typename to sub-fields.
+    :type typename: bool
+
     Example:
         In the query
 
-        ```
-        {
-          query {
-            field1 {
-              __typename
-              field2 {
-                __typename
-                f1
-                f2
-                f3
+        .. code-block:: python
+
+            {
+              query {
+                field1 {
+                  __typename
+                  field2 {
+                    __typename
+                    f1
+                    f2
+                    f3
+                  }
+                }
               }
             }
-          }
-        }
-        ```
 
         we have the following field
 
-        Field(
-            name="field1",
-            fields=[
-                Field(
-                    name="field2",
-                    fields=["f1", "f2", "f3"],
-                    typename=True
-                )
-            ],
-            typename=True
-        )
+        .. code-block:: python
+
+            Field(
+                name="field1",
+                fields=[
+                    Field(
+                        name="field2",
+                        fields=["f1", "f2", "f3"],
+                        typename=True
+                    )
+                ],
+                typename=True
+            )
 
     """
 
@@ -264,6 +342,42 @@ class InlineFragment(GraphQL2PythonQuery):
     """Inline Fragment GraphQL type. See
     https://graphql.org/learn/queries/#inline-fragments
 
+    :param type: GraphQL type for the inline fragment.
+    :type type: str
+    :param arguments: All arguments for the field.
+    :type arguments: List[Argument]
+    :param fields: Sub-fields for the field.
+    :type fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
+    :param typename: Add meta field __typename to sub-fields.
+    :type typename: bool
+
+    :Example:
+
+        In the query
+
+        .. code-block:: python
+
+            '''
+            query HeroForEpisode($ep: Episode!) {
+              hero(episode: $ep) {
+                name
+                ... on Droid {
+                  primaryFunction
+                }
+                ... on Human {
+                  height
+                }
+              }
+            }
+            '''
+
+        we have the following inline fragments
+
+        .. code-block:: python
+
+            droid = InlineFragment(type="Droid", fields=["primaryFunction"])
+            human = InlineFragment(type="Human", fields=["height"])
+
     """
 
     type: str
@@ -293,6 +407,49 @@ class InlineFragment(GraphQL2PythonQuery):
 class Fragment(GraphQL2PythonQuery):
     """GraphQL fragment type. See
     https://graphql.org/learn/queries/#fragments
+
+
+    :param name: Fragment name.
+    :type name: str
+    :param type: GraphQL type for the fragment.
+    :type type: str
+    :param fields: All sub-fields for the fragment.
+    :type fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
+    :param typename: Add meta field __typename to sub-fields.
+    :type typename: bool
+
+    :Example:
+
+        In the query
+
+        .. code-block:: python
+
+            {
+              leftComparison: hero(episode: EMPIRE) {
+                ...comparisonFields
+              }
+              rightComparison: hero(episode: JEDI) {
+                ...comparisonFields
+              }
+            }
+
+            fragment comparisonFields on Character {
+              name
+              appearsIn
+              friends {
+                name
+              }
+            }
+
+        we have the fragment
+
+        .. code-block:: python
+
+            comparisonFields = Fragment(
+                name="comparisonFields",
+                type="Character",
+                fields=["name", "appearsIn", Field(name="friends", fields=["name"])]
+            )
 
     """
 
@@ -327,31 +484,45 @@ class Fragment(GraphQL2PythonQuery):
 class Query(GraphQL2PythonQuery):
     """GraphQL query type. See https://graphql.org/learn/queries/
 
-    Example:
+    :param name: Query name.
+    :type name: str
+    :param alias: Optional query alias.
+    :type alias: str of None
+    :param arguments: All query arguments.
+    :type arguments: List[Argument]
+    :param typename: Add meta field __typename to the query.
+    :type typename: bool
+    :param fields: All sub-fields for the query.
+    :type fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
+
+    :Example:
+
         In the query
 
-        ```
-        {
-          human: human1000th(id: "1000") {
-            name
-            height
-          }
-        }
-        ```
+        .. code-block:: python
+
+            {
+              human: human1000th(id: "1000") {
+                name
+                height
+              }
+            }
 
         we have the Query
 
-        Query(
-            name="human",
-            alias="human1000th",
-            arguments=[
-                Argument(
-                    name="id",
-                    value='"1000"'
-                )
-            ],
-            fields=["name", "height"]
-        )
+        .. code-block:: python
+
+            Query(
+                name="human",
+                alias="human1000th",
+                arguments=[
+                    Argument(
+                        name="id",
+                        value='"1000"'
+                    )
+                ],
+                fields=["name", "height"]
+            )
 
     """
 
@@ -394,38 +565,54 @@ class Query(GraphQL2PythonQuery):
 class Operation(GraphQL2PythonQuery):
     """GraphQL operation type. See https://graphql.org/learn/queries/
 
-    Example:
+    :param type: Operation type.
+    :type type: One of ["query", "mutation", "subscription"]
+    :param name: Optional operation name.
+    :type name: str or None
+    :param variables: All operation variables.
+    :type variables: List[Variable]
+    :param queries: All operation queries.
+    :type queries: List[Query]
+    :param fragments: All fragments for the operation.
+    :type fragments: List[Fragment]
+
+    :Example:
+
         For the query
 
-        ```
-        mutation CreateReviewForEpisode($ep: Episode!, $review: ReviewInput!) {
-          createReview(episode: $ep, review: $review) {
-            stars
-            commentary
-          }
-        }
-        ```
+        .. code-block:: python
+
+            '''
+            mutation CreateReviewForEpisode($ep: Episode!, $review: ReviewInput!) {
+              createReview(episode: $ep, review: $review) {
+                stars
+                commentary
+              }
+            }
+            '''
 
         we have
 
-        var_ep = Variable(name="ep", type="Episode!")
-        var_review = Variable(name="review", type="ReviewInput!")
+        .. code-block:: python
 
-        Operation(
-            type="mutation",
-            name="CreateReviewForEpisode",
-            variables=[var_ep, var_review],
-            queries=[
-                Query(
-                    name="createReview",
-                    arguments=[
-                        Argument(name="episode", value=var_ep),
-                        Argument(name="review", value=var_review),
-                    ],
-                    fields=["stars", "commentary"]
-                ),
-            ],
-        )
+            var_ep = Variable(name="ep", type="Episode!")
+            var_review = Variable(name="review", type="ReviewInput!")
+
+            Operation(
+                type="mutation",
+                name="CreateReviewForEpisode",
+                variables=[var_ep, var_review],
+                queries=[
+                    Query(
+                        name="createReview",
+                        arguments=[
+                            Argument(name="episode", value=var_ep),
+                            Argument(name="review", value=var_review),
+                        ],
+                        fields=["stars", "commentary"]
+                    ),
+                ],
+            )
 
     """
 

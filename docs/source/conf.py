@@ -14,15 +14,32 @@ version = '0.0.2'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = [
+    'sphinxarg.ext',
+    'sphinx.ext.autodoc',
+    'sphinx_rtd_theme',
+]
 
 templates_path = ['_templates']
 exclude_patterns = []
 
 
-
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'furo'
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+
+
+# -- AutoDoc configuration -------------------------------------------------
+# autoclass_content = "both"
+
+autodoc_default_options = {
+    'members': True,
+    'inherited-members': False,
+    'special-members': '__init__',
+    'undoc-members': True,
+    'show-inheritance': True
+}
+
+autosummary_generate = True
