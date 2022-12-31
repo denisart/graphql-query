@@ -419,6 +419,91 @@ fragment comparisonFields on Character {
     }
   }
 }'''
+        ),
+        # mutation {
+        #   addContent(
+        #     title: "ContentTitle",
+        #     description: "content description",
+        #     active: true,
+        #     chapters: [
+        #       {
+        #         title: "chapter title",
+        #         lessons: [
+        #           {
+        #             title: "lesson title",
+        #             filePath: "static-resource-path"
+        #           },
+        #           {
+        #             title: "lesson title 2",
+        #             filePath: "static-resource-path2"
+        #           }
+        #         ]
+        #       }
+        #     ]
+        #   ) {
+        #     success
+        #   }
+        # }
+        (
+            "mutation", None,
+            [],
+            [
+                Query(
+                    name="addContent",
+                    arguments=[
+                        Argument(name="title", value='"ContentTitle"'),
+                        Argument(name="description", value='"content description"'),
+                        Argument(name="active", value='true'),
+                        Argument(
+                            name="chapters",
+                            value=[
+                                [
+                                    Argument(name="title", value='"chapter title"'),
+                                    Argument(
+                                        name="lessons",
+                                        value=[
+                                            [
+                                                Argument(name="title", value='"lesson title"'),
+                                                Argument(name="filePath", value='"static-resource-path"')
+                                            ],
+                                            [
+                                                Argument(name="title", value='"lesson title 2"'),
+                                                Argument(name="filePath", value='"static-resource-path 2"')
+                                            ]
+                                        ]
+                                    ),
+                                ]
+                            ]
+                        ),
+                    ],
+                    fields=["success"]
+                )
+            ],
+            [],
+            """mutation {
+  addContent(
+    title: "ContentTitle"
+    description: "content description"
+    active: true
+    chapters: [
+      {
+        title: "chapter title"
+        lessons: [
+          {
+            title: "lesson title"
+            filePath: "static-resource-path"
+          }
+          {
+            title: "lesson title 2"
+            filePath: "static-resource-path 2"
+          }
+        ]
+      }
+    ]
+  ) {
+    success
+  }
+}"""
         )
     ]
 )
