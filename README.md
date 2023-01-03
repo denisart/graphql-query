@@ -4,7 +4,7 @@
 [![last-commit](https://img.shields.io/github/last-commit/denisart/graphql-query/master)](https://github.com/denisart/graphql-query/commits/master)
 [![license](https://img.shields.io/github/license/denisart/graphql-query)](https://github.com/denisart/graphql-query/blob/master/LICENSE)
 
-**graphql_query** is python classes for generating GraphQL queries.
+**graphql_query** is complete GraphQL query code generator for python.
 The documentation for **graphql_query** can be found at [https://denisart.github.io/graphql-query/](https://denisart.github.io/graphql-query/).
 
 ## Quickstart

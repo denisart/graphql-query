@@ -191,27 +191,25 @@ class Argument(GraphQL2PythonQuery):
                 value=self.value.name
             )
 
-        if isinstance(self.value, list):
+        if isinstance(self.value, list) and isinstance(self.value[0], Argument):
             # self.value is List[Argument]
-            if isinstance(self.value[0], Argument):
-                return self._template_key_arguments.render(
-                    name=self.name,
-                    arguments=[
-                        self._line_shift(argument.render())
-                        for argument in self.value  # type: ignore
-                    ]
-                )
-
-            # self.value is List[List[Argument]]
-            return self._template_key_objects.render(
+            return self._template_key_arguments.render(
                 name=self.name,
-                list_arguments=[
-                    [
-                        self._line_shift(self._line_shift(argument.render()))  # type: ignore
-                        for argument in arguments
-                    ] for arguments in self.value
+                arguments=[
+                    self._line_shift(argument.render()) for argument in self.value  # type: ignore
                 ]
             )
+
+        # self.value is List[List[Argument]]
+        return self._template_key_objects.render(
+            name=self.name,
+            list_arguments=[
+                [
+                    self._line_shift(self._line_shift(argument.render()))  # type: ignore
+                    for argument in arguments
+                ] for arguments in self.value
+            ]
+        )
 
 
 class Directive(GraphQL2PythonQuery):
