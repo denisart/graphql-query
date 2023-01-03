@@ -14,6 +14,7 @@ from graphql_query.types import template_env
         "argument_key_argument.jinja2",
         "argument_key_variable.jinja2",
         "argument_key_arguments.jinja2",
+        "argument_key_objects.jinja2",
         # for Directive
         "directive.jinja2",
         # for Field

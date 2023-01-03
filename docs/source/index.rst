@@ -13,7 +13,7 @@ Welcome to GRAPHQL_QUERY documentation!
 .. image:: https://img.shields.io/github/license/denisart/graphql-query
   :alt: license
 
-**graphql_query** is python classes for generating GraphQL queries.
+**graphql_query** is complete GraphQL query code generator for python.
 
 Documentation for version:  |version|
 

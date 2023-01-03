@@ -1,5 +1,5 @@
 How to use
-=========
+==========
 
 **graphql_query** provides special python classes for generate of GraphQL queries.
 Below are examples of using these classes for queries from GraphQL documentation
@@ -377,7 +377,7 @@ If you use directives in your queries then using **graphql_query.Directive**
   # }
 
 Mutations
--------
+---------
 
 Creating mutation is the same as creating query
 
@@ -502,5 +502,108 @@ Typename of fields
   #     ... on Starship {
   #       name
   #     }
+  #   }
+  # }
+
+Argument as list of objects
+---------------------------
+
+If you have an argument as list of objects
+
+.. code-block:: python
+
+  """
+  mutation {
+    addContent(
+      title: "ContentTitle",
+      description: "content description",
+      active: true,
+      chapters: [
+        {
+          title: "chapter title",
+          lessons: [
+            {
+              title: "lesson title",
+              filePath: "static-resource-path"
+            },
+            {
+              title: "lesson title 2",
+              filePath: "static-resource-path2"
+            }
+          ]
+        }
+      ]
+    ) {
+      success
+    }
+  }
+  """
+
+You can to render this case as well
+
+.. code-block:: python
+
+  from graphql_query import Argument
+
+  content_title = Argument(name="title", value='"ContentTitle"')
+  description = Argument(name="description", value='"content description"')
+  active = Argument(name="active", value='true')
+
+  chapters = Argument(
+      name="chapters",
+      value=[
+          # list with list of arguments
+          [
+              Argument(name="title", value='"chapter title"'),
+              Argument(
+                  name="lessons",
+                  value=[
+                      # list with list of arguments
+                      [
+                          Argument(name="title", value='"lesson title"'),
+                          Argument(name="filePath", value='"static-resource-path"'),
+                      ],
+                      [
+                          Argument(name="title", value='"lesson title 2"'),
+                          Argument(name="filePath", value='"static-resource-path 2"'),
+                      ]
+                  ]
+              )
+          ]
+      ]
+  )
+
+  addContent = Query(
+      name="addContent",
+      arguments=[
+          content_title, description, active, chapters
+      ],
+      fields=["success"]
+  )
+  operation = Operation(type="mutation", queries=[addContent])
+
+  print(operation.render())
+  # mutation {
+  #   addContent(
+  #     title: "ContentTitle"
+  #     description: "content description"
+  #     active: true
+  #     chapters: [
+  #       {
+  #         title: "chapter title"
+  #         lessons: [
+  #           {
+  #             title: "lesson title"
+  #             filePath: "static-resource-path"
+  #           }
+  #           {
+  #             title: "lesson title 2"
+  #             filePath: "static-resource-path 2"
+  #           }
+  #         ]
+  #       }
+  #     ]
+  #   ) {
+  #     success
   #   }
   # }

@@ -60,7 +60,29 @@ def test_argument_from_data(arg: Argument, result: str):
   }
 }"""
         ),
-
+        (
+            "lessons",
+            [
+                [
+                    Argument(name="title", value='"lesson title"'),
+                    Argument(name="filePath", value='"static-resource-path"')
+                ],
+                [
+                    Argument(name="title", value='"lesson title 2"'),
+                    Argument(name="filePath", value='"static-resource-path 2"')
+                ],
+            ],
+            """lessons: [
+  {
+    title: "lesson title"
+    filePath: "static-resource-path"
+  }
+  {
+    title: "lesson title 2"
+    filePath: "static-resource-path 2"
+  }
+]"""
+        )
     ]
 )
 def test_argument(name: str, value: Union[str, Argument, List[Argument], Variable], result: str):

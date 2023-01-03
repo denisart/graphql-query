@@ -163,12 +163,13 @@ class Argument(GraphQL2PythonQuery):
     """
 
     name: str
-    value: Union[str, 'Argument', List['Argument'], Variable]
+    value: Union[str, 'Argument', List['Argument'], List[List['Argument']], Variable]
 
     _template_key_value: Template = template_env.get_template("argument_key_value.jinja2")
     _template_key_argument: Template = template_env.get_template("argument_key_argument.jinja2")
     _template_key_variable: Template = template_env.get_template("argument_key_variable.jinja2")
     _template_key_arguments: Template = template_env.get_template("argument_key_arguments.jinja2")
+    _template_key_objects: Template = template_env.get_template("argument_key_objects.jinja2")
 
     @validator("name")
     def graphql_argument_name(cls, name: str):
@@ -190,9 +191,24 @@ class Argument(GraphQL2PythonQuery):
                 value=self.value.name
             )
 
-        return self._template_key_arguments.render(
+        if isinstance(self.value, list) and isinstance(self.value[0], Argument):
+            # self.value is List[Argument]
+            return self._template_key_arguments.render(
+                name=self.name,
+                arguments=[
+                    self._line_shift(argument.render()) for argument in self.value  # type: ignore
+                ]
+            )
+
+        # self.value is List[List[Argument]]
+        return self._template_key_objects.render(
             name=self.name,
-            arguments=[self._line_shift(argument.render()) for argument in self.value]
+            list_arguments=[
+                [
+                    self._line_shift(self._line_shift(argument.render()))  # type: ignore
+                    for argument in arguments
+                ] for arguments in self.value
+            ]
         )
 
 
