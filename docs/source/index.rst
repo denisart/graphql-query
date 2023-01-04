@@ -27,4 +27,5 @@ Contents
 
   intro
   usage
+  examples
   api
