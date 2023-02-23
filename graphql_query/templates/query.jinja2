@@ -4,11 +4,12 @@
 ({% for argument in arguments %}
   {{ argument }}
 {%- endfor %}
-){% endif %} {
+){% endif %}
+{%- if fields is defined and fields|length > 0 %} {
 {%- if typename %}
   __typename
 {%- endif %}
 {%- for field in fields %}
   {{ field }}
 {%- endfor %}
-}
+}{% endif %}
