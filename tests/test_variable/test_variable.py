@@ -4,8 +4,6 @@ import pytest
 
 from graphql_query import Variable
 
-from .data import var_ep, var_first, var_review
-
 
 @pytest.mark.parametrize(
     "name, var_type, default, result",
@@ -23,9 +21,9 @@ def test_variable(name: str, var_type: str, default: Optional[str], result: str)
 @pytest.mark.parametrize(
     "var, result",
     [
-        (var_ep, "$ep: Episode!"),
-        (var_first, "$first: Int = 3"),
-        (var_review, "$review: ReviewInput!"),
+        (Variable(name="ep", type="Episode!"), "$ep: Episode!"),
+        (Variable(name="first", type="Int", default="3"), "$first: Int = 3"),
+        (Variable(name="review", type="ReviewInput!"), "$review: ReviewInput!"),
     ]
 )
 def test_variable_from_data(var: Variable, result: str):
