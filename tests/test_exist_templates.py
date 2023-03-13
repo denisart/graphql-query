@@ -11,6 +11,7 @@ from graphql_query.types import template_env
         "variable.jinja2",
         # for Argument
         "argument_key_value.jinja2",
+        "argument_key_values.jinja2",
         "argument_key_argument.jinja2",
         "argument_key_variable.jinja2",
         "argument_key_arguments.jinja2",
