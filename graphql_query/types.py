@@ -163,9 +163,19 @@ class Argument(GraphQL2PythonQuery):
     """
 
     name: str
-    value: Union[str, 'Argument', List['Argument'], List[List['Argument']], Variable]
+    value: Union[
+        str,
+        int,
+        'Argument',
+        Variable,
+        List[str],
+        List[int],
+        List['Argument'],
+        List[List['Argument']],
+    ]
 
     _template_key_value: Template = template_env.get_template("argument_key_value.jinja2")
+    _template_key_values: Template = template_env.get_template("argument_key_values.jinja2")
     _template_key_argument: Template = template_env.get_template("argument_key_argument.jinja2")
     _template_key_variable: Template = template_env.get_template("argument_key_variable.jinja2")
     _template_key_arguments: Template = template_env.get_template("argument_key_arguments.jinja2")
@@ -175,41 +185,82 @@ class Argument(GraphQL2PythonQuery):
     def graphql_argument_name(cls, name: str):
         return assert_name(name)
 
+    def _render_for_str(self, name: str, value: str) -> str:
+        return self._template_key_value.render(name=name, value=value)
+
+    def _render_for_int(self, name: str, value: int) -> str:
+        return self._template_key_value.render(name=name, value=str(value))
+
+    def _render_for_argument(self, name: str, value: 'Argument') -> str:
+        return self._template_key_argument.render(
+            name=name,
+            argument=self._line_shift(value.render())
+        )
+
+    def _render_for_list_str(self, name: str, value: List[str]) -> str:
+        return self._template_key_values.render(name=name, values=value)
+
+    def _render_for_list_int(self, name: str, value: List[int]) -> str:
+        return self._template_key_values.render(
+            name=name, values=[str(v) for v in value]
+        )
+
+    def _render_for_list_argument(self, name: str, value: List['Argument']) -> str:
+        return self._template_key_arguments.render(
+            name=name,
+            arguments=[
+                self._line_shift(argument.render()) for argument in value
+            ]
+        )
+
+    def _render_for_list_list_argument(self, name: str, value: List[List['Argument']]) -> str:
+        return self._template_key_objects.render(
+            name=name,
+            list_arguments=[
+                [
+                    self._line_shift(self._line_shift(argument.render()))
+                    for argument in arguments
+                ] for arguments in value
+            ]
+        )
+
+    def _render_for_variable(self, name: str, value: Variable) -> str:
+        return self._template_key_variable.render(
+            name=name,
+            value=value.name
+        )
+
     def render(self) -> str:
+        # pylint: disable=too-many-return-statements
         if isinstance(self.value, str):
-            return self._template_key_value.render(name=self.name, value=self.value)
+            return self._render_for_str(self.name, self.value)
+
+        if isinstance(self.value, int):
+            return self._render_for_int(self.name, self.value)
 
         if isinstance(self.value, Argument):
-            return self._template_key_argument.render(
-                name=self.name,
-                argument=self._line_shift(self.value.render())
-            )
+            return self._render_for_argument(self.name, self.value)
 
         if isinstance(self.value, Variable):
-            return self._template_key_variable.render(
-                name=self.name,
-                value=self.value.name
-            )
+            return self._render_for_variable(self.name, self.value)
+
+        if isinstance(self.value, list) and (len(self.value) == 0):
+            return self._render_for_list_str(self.name, self.value)  # type: ignore
 
         if isinstance(self.value, list) and isinstance(self.value[0], Argument):
             # self.value is List[Argument]
-            return self._template_key_arguments.render(
-                name=self.name,
-                arguments=[
-                    self._line_shift(argument.render()) for argument in self.value  # type: ignore
-                ]
-            )
+            return self._render_for_list_argument(self.name, self.value)  # type: ignore
+
+        if isinstance(self.value, list) and isinstance(self.value[0], str):
+            # self.value is List[str]
+            return self._render_for_list_str(self.name, self.value)  # type: ignore
+
+        if isinstance(self.value, list) and isinstance(self.value[0], int):
+            # self.value is List[str]
+            return self._render_for_list_int(self.name, self.value)  # type: ignore
 
         # self.value is List[List[Argument]]
-        return self._template_key_objects.render(
-            name=self.name,
-            list_arguments=[
-                [
-                    self._line_shift(self._line_shift(argument.render()))  # type: ignore
-                    for argument in arguments
-                ] for arguments in self.value
-            ]
-        )
+        return self._render_for_list_list_argument(self.name, self.value)  # type: ignore
 
 
 class Directive(GraphQL2PythonQuery):
