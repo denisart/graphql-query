@@ -4,7 +4,16 @@
 [![last-commit](https://img.shields.io/github/last-commit/denisart/graphql-query/master)](https://github.com/denisart/graphql-query/commits/master)
 [![license](https://img.shields.io/github/license/denisart/graphql-query)](https://github.com/denisart/graphql-query/blob/master/LICENSE)
 
-**graphql_query** is complete GraphQL query code generator for python.
+---
+
+**graphql_query** is complete GraphQL query code generator for python. With **graphql_query**
+you can
+
+- generate a GraphQL query string from a python class;
+- use and share similar Arguments, Variables and e.t.c between different queries;
+- easily add new fields to your query;
+- add Fragments and Directives to queries;
+
 The documentation for **graphql_query** can be found at [https://denisart.github.io/graphql-query/](https://denisart.github.io/graphql-query/).
 
 ## Quickstart
@@ -17,7 +26,7 @@ pip install graphql_query
 
 ### Simple query
 
-Code for simple query
+Code for the simple query
 
 ```graphql
 {
@@ -37,21 +46,21 @@ operation = Operation(type="query", queries=[hero])
 
 print(operation.render())
 # query {
-#  hero {
-#    name
-#  }
+#   hero {
+#     name
+#   }
 # }
 ```
 
 The `render` method for the `graphql_query.Operation` object
-just returns the final string with the query. Inside the `fields` array of the `graphql_query.Query` object
+just returns the final string with a query. Inside the `fields` array of the `graphql_query.Query` object
 you can use
 
 - `str` (a field name);
 - object of `graphql_query.Field` type;
 - `graphql_query.Fragment` and `graphql_query.InlineFragment`.
 
-### With arguments, variables and directive
+### Arguments, Variables and Directives
 
 For generation of the following query
 
@@ -85,12 +94,7 @@ hero = Query(
         Field(
             name="friends",
             fields=["name"],
-            directives=[
-                Directive(
-                    name="include",
-                    arguments=[arg_if]
-                )
-            ]
+            directives=[Directive(name="include", arguments=[arg_if])]
         )
     ]
 )
@@ -117,3 +121,5 @@ print(operation.render())
 #   }
 # }
 ```
+
+You can find other examples in the documentation.
