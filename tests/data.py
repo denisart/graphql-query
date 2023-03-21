@@ -46,10 +46,7 @@ field_node = Field(name="node", fields=["name"])
 field_friends_connection = Field(
     name="friendsConnection",
     arguments=[Argument(name="first", value=var_first)],
-    fields=[
-        "totalCount",
-        Field(name="edges", fields=[field_node])
-    ]
+    fields=["totalCount", Field(name="edges", fields=[field_node])],
 )
 
 

@@ -87,11 +87,7 @@ class Variable(GraphQL2PythonQuery):
         return assert_name(name)
 
     def render(self) -> str:
-        return self._template.render(
-            name=self.name,
-            type=self.type,
-            default=self.default
-        )
+        return self._template.render(name=self.name, type=self.type, default=self.default)
 
 
 class Argument(GraphQL2PythonQuery):
@@ -192,43 +188,29 @@ class Argument(GraphQL2PythonQuery):
         return self._template_key_value.render(name=name, value=str(value))
 
     def _render_for_argument(self, name: str, value: 'Argument') -> str:
-        return self._template_key_argument.render(
-            name=name,
-            argument=self._line_shift(value.render())
-        )
+        return self._template_key_argument.render(name=name, argument=self._line_shift(value.render()))
 
     def _render_for_list_str(self, name: str, value: List[str]) -> str:
         return self._template_key_values.render(name=name, values=value)
 
     def _render_for_list_int(self, name: str, value: List[int]) -> str:
-        return self._template_key_values.render(
-            name=name, values=[str(v) for v in value]
-        )
+        return self._template_key_values.render(name=name, values=[str(v) for v in value])
 
     def _render_for_list_argument(self, name: str, value: List['Argument']) -> str:
         return self._template_key_arguments.render(
-            name=name,
-            arguments=[
-                self._line_shift(argument.render()) for argument in value
-            ]
+            name=name, arguments=[self._line_shift(argument.render()) for argument in value]
         )
 
     def _render_for_list_list_argument(self, name: str, value: List[List['Argument']]) -> str:
         return self._template_key_objects.render(
             name=name,
             list_arguments=[
-                [
-                    self._line_shift(self._line_shift(argument.render()))
-                    for argument in arguments
-                ] for arguments in value
-            ]
+                [self._line_shift(self._line_shift(argument.render())) for argument in arguments] for arguments in value
+            ],
         )
 
     def _render_for_variable(self, name: str, value: Variable) -> str:
-        return self._template_key_variable.render(
-            name=name,
-            value=value.name
-        )
+        return self._template_key_variable.render(name=name, value=value.name)
 
     def render(self) -> str:
         # pylint: disable=too-many-return-statements
@@ -315,8 +297,7 @@ class Directive(GraphQL2PythonQuery):
 
     def render(self) -> str:
         return self._template_directive.render(
-            name=self.name,
-            arguments=[self._line_shift(argument.render()) for argument in self.arguments]
+            name=self.name, arguments=[self._line_shift(argument.render()) for argument in self.arguments]
         )
 
 
@@ -376,9 +357,7 @@ class Field(GraphQL2PythonQuery):
     name: str
     alias: Optional[str] = PydanticField(default=None)
     arguments: List[Argument] = PydanticField(default_factory=list)
-    fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(
-        default_factory=list
-    )
+    fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
     directives: List[Directive] = PydanticField(default_factory=list)
     typename: bool = PydanticField(default=False, description="add meta field __typename to sub-fields")
 
@@ -401,7 +380,7 @@ class Field(GraphQL2PythonQuery):
             arguments=[self._line_shift(argument.render()) for argument in self.arguments],
             fields=[self._render_field(field) for field in self.fields],
             directives=[directive.render() for directive in self.directives],
-            typename=self.typename
+            typename=self.typename,
         )
 
 
@@ -449,9 +428,7 @@ class InlineFragment(GraphQL2PythonQuery):
 
     type: str
     arguments: List[Argument] = PydanticField(default_factory=list)
-    fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(
-        default_factory=list
-    )
+    fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
     typename: bool = PydanticField(default=False, description="add meta field __typename to sub-fields")
 
     _template: Template = template_env.get_template("inline_fragment.jinja2")
@@ -467,7 +444,7 @@ class InlineFragment(GraphQL2PythonQuery):
             type=self.type,
             arguments=[self._line_shift(argument.render()) for argument in self.arguments],
             fields=[self._render_field(field) for field in self.fields],
-            typename=self.typename
+            typename=self.typename,
         )
 
 
@@ -522,9 +499,7 @@ class Fragment(GraphQL2PythonQuery):
 
     name: str
     type: str
-    fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(
-        default_factory=list
-    )
+    fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
     typename: bool = PydanticField(default=False, description="add meta field __typename to sub-fields")
 
     _template: Template = template_env.get_template("fragment.jinja2")
@@ -597,9 +572,7 @@ class Query(GraphQL2PythonQuery):
     alias: Optional[str] = PydanticField(default=None)
     arguments: List[Argument] = PydanticField(default_factory=list)
     typename: bool = PydanticField(default=False, description="add meta field __typename to the query")
-    fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(
-        default_factory=list
-    )
+    fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
 
     _template: Template = template_env.get_template("query.jinja2")
 
@@ -625,7 +598,7 @@ class Query(GraphQL2PythonQuery):
             alias=self.alias,
             arguments=[self._line_shift(argument.render()) for argument in self.arguments],
             typename=self.typename,
-            fields=[self._render_field(field) for field in self.fields]
+            fields=[self._render_field(field) for field in self.fields],
         )
 
 
@@ -683,25 +656,14 @@ class Operation(GraphQL2PythonQuery):
 
     """
 
-    type: str = PydanticField(
-        default="query",
-        description="https://graphql.org/learn/queries"
-    )
-    name: Optional[str] = PydanticField(
-        default=None,
-        description="https://graphql.org/learn/queries/#operation-name"
-    )
+    type: str = PydanticField(default="query", description="https://graphql.org/learn/queries")
+    name: Optional[str] = PydanticField(default=None, description="https://graphql.org/learn/queries/#operation-name")
     variables: List[Variable] = PydanticField(
-        default_factory=list,
-        description="https://graphql.org/learn/queries/#fragments"
+        default_factory=list, description="https://graphql.org/learn/queries/#fragments"
     )
-    queries: List[Query] = PydanticField(
-        default_factory=list,
-        description="Queries for this GraphQL operation."
-    )
+    queries: List[Query] = PydanticField(default_factory=list, description="Queries for this GraphQL operation.")
     fragments: List[Fragment] = PydanticField(
-        default_factory=list,
-        description="https://graphql.org/learn/queries/#fragments"
+        default_factory=list, description="https://graphql.org/learn/queries/#fragments"
     )
 
     _template: Template = template_env.get_template("operation.jinja2")

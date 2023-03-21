@@ -38,14 +38,10 @@ def test_value_is_list_int():
         (
             "filter",
             Argument(name="field", value=['"value1"', '"value2"']),
-            'filter: {\n  field: ["value1", "value2"]\n}'
+            'filter: {\n  field: ["value1", "value2"]\n}',
         ),
-        (
-            "filter",
-            Argument(name="field", value=Variable(name="var", type="Variable")),
-            'filter: {\n  field: $var\n}'
-        )
-    ]
+        ("filter", Argument(name="field", value=Variable(name="var", type="Variable")), 'filter: {\n  field: $var\n}'),
+    ],
 )
 def test_value_is_argument(name: str, value: Argument, result: str):
     arg = Argument(name=name, value=value)
@@ -59,13 +55,7 @@ def test_value_is_variable():
 
 
 def test_value_is_list_of_args():
-    arg = Argument(
-        name="filter",
-        value=[
-            Argument(name="arg1", value="VALUE1"),
-            Argument(name="arg2", value="VALUE2")
-        ]
-    )
+    arg = Argument(name="filter", value=[Argument(name="arg1", value="VALUE1"), Argument(name="arg2", value="VALUE2")])
     assert arg.render() == "filter: {\n  arg1: VALUE1\n  arg2: VALUE2\n}"
 
 
@@ -74,13 +64,9 @@ def test_value_is_args_with_args():
         name="filter1",
         value=[
             Argument(
-                name="filter2",
-                value=[
-                    Argument(name="arg1", value="VALUE1"),
-                    Argument(name="arg2", value="VALUE2")
-                ]
+                name="filter2", value=[Argument(name="arg1", value="VALUE1"), Argument(name="arg2", value="VALUE2")]
             )
-        ]
+        ],
     )
     assert arg.render() == "filter1: {\n  filter2: {\n    arg1: VALUE1\n    arg2: VALUE2\n  }\n}"
 
@@ -93,12 +79,14 @@ def test_value_long():
                 name="filter2",
                 value=[
                     Argument(name="arg1", value="VALUE1"),
-                    Argument(name="filter3", value=Argument(name="arg2", value="VALUE2"))
-                ]
+                    Argument(name="filter3", value=Argument(name="arg2", value="VALUE2")),
+                ],
             )
-        ]
+        ],
     )
-    assert arg.render() == """filter1: {
+    assert (
+        arg.render()
+        == """filter1: {
   filter2: {
     arg1: VALUE1
     filter3: {
@@ -106,23 +94,23 @@ def test_value_long():
     }
   }
 }"""
+    )
 
 
 def test_value_if_list_of_list_of_args():
     arg = Argument(
         name="lessons",
         value=[
-            [
-                Argument(name="title", value='"lesson title"'),
-                Argument(name="filePath", value='"static-resource-path"')
-            ],
+            [Argument(name="title", value='"lesson title"'), Argument(name="filePath", value='"static-resource-path"')],
             [
                 Argument(name="title", value='"lesson title 2"'),
-                Argument(name="filePath", value='"static-resource-path 2"')
+                Argument(name="filePath", value='"static-resource-path 2"'),
             ],
         ],
     )
-    assert arg.render() == """lessons: [
+    assert (
+        arg.render()
+        == """lessons: [
   {
     title: "lesson title"
     filePath: "static-resource-path"
@@ -132,3 +120,4 @@ def test_value_if_list_of_list_of_args():
     filePath: "static-resource-path 2"
   }
 ]"""
+    )

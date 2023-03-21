@@ -13,10 +13,7 @@ from graphql_query import Argument, Directive, Field, Fragment, Operation, Query
         #     name
         #   }
         # }
-        (
-            "query", None, [], [Query(name="hero", fields=["name"])], [],
-            "query {\n  hero {\n    name\n  }\n}"
-        ),
+        ("query", None, [], [Query(name="hero", fields=["name"])], [], "query {\n  hero {\n    name\n  }\n}"),
         # {
         #   hero {
         #     name
@@ -27,10 +24,12 @@ from graphql_query import Argument, Directive, Field, Fragment, Operation, Query
         #   }
         # }
         (
-            "query", None, [],
+            "query",
+            None,
+            [],
             [Query(name="hero", fields=["name", Field(name="friends", fields=["name"])])],
             [],
-            "query {\n  hero {\n    name\n    friends {\n      name\n    }\n  }\n}"
+            "query {\n  hero {\n    name\n    friends {\n      name\n    }\n  }\n}",
         ),
         # {
         #   human(id: "1000") {
@@ -39,12 +38,12 @@ from graphql_query import Argument, Directive, Field, Fragment, Operation, Query
         #   }
         # }
         (
-            "query", None, [],
-            [
-                Query(name="human", arguments=[Argument(name="id", value='"1000"')], fields=["name", "height"])
-            ],
+            "query",
+            None,
             [],
-            'query {\n  human(\n    id: "1000"\n  ) {\n    name\n    height\n  }\n}'
+            [Query(name="human", arguments=[Argument(name="id", value='"1000"')], fields=["name", "height"])],
+            [],
+            'query {\n  human(\n    id: "1000"\n  ) {\n    name\n    height\n  }\n}',
         ),
         # {
         #   human(id: "1000") {
@@ -53,19 +52,18 @@ from graphql_query import Argument, Directive, Field, Fragment, Operation, Query
         #   }
         # }
         (
-            "query", None, [],
+            "query",
+            None,
+            [],
             [
                 Query(
                     name="human",
                     arguments=[Argument(name="id", value='"1000"')],
-                    fields=[
-                        "name",
-                        Field(name="height", arguments=[Argument(name="unit", value="FOOT")])
-                    ]
+                    fields=["name", Field(name="height", arguments=[Argument(name="unit", value="FOOT")])],
                 )
             ],
             [],
-            'query {\n  human(\n    id: "1000"\n  ) {\n    name\n    height(\n      unit: FOOT\n    )\n  }\n}'
+            'query {\n  human(\n    id: "1000"\n  ) {\n    name\n    height(\n      unit: FOOT\n    )\n  }\n}',
         ),
         # {
         #   empireHero: hero(episode: EMPIRE) {
@@ -76,19 +74,18 @@ from graphql_query import Argument, Directive, Field, Fragment, Operation, Query
         #   }
         # }
         (
-            "query", None, [],
+            "query",
+            None,
+            [],
             [
                 Query(
                     name="hero",
                     alias="empireHero",
                     arguments=[Argument(name="episode", value='EMPIRE')],
-                    fields=["name"]
+                    fields=["name"],
                 ),
                 Query(
-                    name="hero",
-                    alias="jediHero",
-                    arguments=[Argument(name="episode", value='JEDI')],
-                    fields=["name"]
+                    name="hero", alias="jediHero", arguments=[Argument(name="episode", value='JEDI')], fields=["name"]
                 ),
             ],
             [],
@@ -104,7 +101,7 @@ from graphql_query import Argument, Directive, Field, Fragment, Operation, Query
   ) {
     name
   }
-}'''
+}''',
         ),
         # {
         #   leftComparison: hero(episode: EMPIRE) {
@@ -123,7 +120,9 @@ from graphql_query import Argument, Directive, Field, Fragment, Operation, Query
         #   }
         # }
         (
-            "query", None, [],
+            "query",
+            None,
+            [],
             [
                 Query(
                     name="hero",
@@ -133,13 +132,9 @@ from graphql_query import Argument, Directive, Field, Fragment, Operation, Query
                         Fragment(
                             name="comparisonFields",
                             type="Character",
-                            fields=[
-                                "name",
-                                "appearsIn",
-                                Field(name="friends", fields=["name"])
-                            ]
+                            fields=["name", "appearsIn", Field(name="friends", fields=["name"])],
                         )
-                    ]
+                    ],
                 ),
                 Query(
                     name="hero",
@@ -149,24 +144,16 @@ from graphql_query import Argument, Directive, Field, Fragment, Operation, Query
                         Fragment(
                             name="comparisonFields",
                             type="Character",
-                            fields=[
-                                "name",
-                                "appearsIn",
-                                Field(name="friends", fields=["name"])
-                            ]
+                            fields=["name", "appearsIn", Field(name="friends", fields=["name"])],
                         )
-                    ]
+                    ],
                 ),
             ],
             [
                 Fragment(
                     name="comparisonFields",
                     type="Character",
-                    fields=[
-                        "name",
-                        "appearsIn",
-                        Field(name="friends", fields=["name"])
-                    ]
+                    fields=["name", "appearsIn", Field(name="friends", fields=["name"])],
                 )
             ],
             '''query {
@@ -189,7 +176,7 @@ fragment comparisonFields on Character {
   friends {
     name
   }
-}'''
+}''',
         ),
         # query HeroComparison($first: Int = 3) {
         #   leftComparison: hero(episode: EMPIRE) {
@@ -212,7 +199,9 @@ fragment comparisonFields on Character {
         #   }
         # }
         (
-            "query", "HeroComparison", [Variable(name="first", type="Int", default="3")],
+            "query",
+            "HeroComparison",
+            [Variable(name="first", type="Int", default="3")],
             [
                 Query(
                     name="hero",
@@ -227,22 +216,16 @@ fragment comparisonFields on Character {
                                 Field(
                                     name="friendsConnection",
                                     arguments=[
-                                        Argument(
-                                            name="first",
-                                            value=Variable(name="first", type="Int", default="3")
-                                        )
+                                        Argument(name="first", value=Variable(name="first", type="Int", default="3"))
                                     ],
                                     fields=[
                                         "totalCount",
-                                        Field(
-                                            name="edges",
-                                            fields=[Field(name="node", fields=["name"])]
-                                        )
-                                    ]
-                                )
-                            ]
+                                        Field(name="edges", fields=[Field(name="node", fields=["name"])]),
+                                    ],
+                                ),
+                            ],
                         )
-                    ]
+                    ],
                 ),
                 Query(
                     name="hero",
@@ -257,22 +240,16 @@ fragment comparisonFields on Character {
                                 Field(
                                     name="friendsConnection",
                                     arguments=[
-                                        Argument(
-                                            name="first",
-                                            value=Variable(name="first", type="Int", default="3")
-                                        )
+                                        Argument(name="first", value=Variable(name="first", type="Int", default="3"))
                                     ],
                                     fields=[
                                         "totalCount",
-                                        Field(
-                                            name="edges",
-                                            fields=[Field(name="node", fields=["name"])]
-                                        )
-                                    ]
-                                )
-                            ]
+                                        Field(name="edges", fields=[Field(name="node", fields=["name"])]),
+                                    ],
+                                ),
+                            ],
                         )
-                    ]
+                    ],
                 ),
             ],
             [
@@ -283,21 +260,10 @@ fragment comparisonFields on Character {
                         "name",
                         Field(
                             name="friendsConnection",
-                            arguments=[
-                                Argument(
-                                    name="first",
-                                    value=Variable(name="first", type="Int", default="3")
-                                )
-                            ],
-                            fields=[
-                                "totalCount",
-                                Field(
-                                    name="edges",
-                                    fields=[Field(name="node", fields=["name"])]
-                                )
-                            ]
-                        )
-                    ]
+                            arguments=[Argument(name="first", value=Variable(name="first", type="Int", default="3"))],
+                            fields=["totalCount", Field(name="edges", fields=[Field(name="node", fields=["name"])])],
+                        ),
+                    ],
                 )
             ],
             '''query HeroComparison(
@@ -328,7 +294,7 @@ fragment comparisonFields on Character {
       }
     }
   }
-}'''
+}''',
         ),
         # mutation CreateReviewForEpisode($ep: Episode!, $review: ReviewInput!) {
         #   createReview(episode: $ep, review: $review) {
@@ -337,11 +303,9 @@ fragment comparisonFields on Character {
         #   }
         # }
         (
-            "mutation", "CreateReviewForEpisode",
-            [
-                Variable(name="ep", type="Episode!"),
-                Variable(name="review", type="ReviewInput!")
-            ],
+            "mutation",
+            "CreateReviewForEpisode",
+            [Variable(name="ep", type="Episode!"), Variable(name="review", type="ReviewInput!")],
             [
                 Query(
                     name="createReview",
@@ -349,7 +313,7 @@ fragment comparisonFields on Character {
                         Argument(name="episode", value=Variable(name="ep", type="Episode!")),
                         Argument(name="review", value=Variable(name="review", type="ReviewInput!")),
                     ],
-                    fields=["stars", "commentary"]
+                    fields=["stars", "commentary"],
                 ),
             ],
             [],
@@ -364,7 +328,7 @@ fragment comparisonFields on Character {
     stars
     commentary
   }
-}'''
+}''',
         ),
         # query Hero($episode: Episode, $withFriends: Boolean!) {
         #   hero(episode: $episode) {
@@ -375,11 +339,9 @@ fragment comparisonFields on Character {
         #   }
         # }
         (
-            "query", "Hero",
-            [
-                Variable(name="episode", type="Episode"),
-                Variable(name="withFriends", type="Boolean!")
-            ],
+            "query",
+            "Hero",
+            [Variable(name="episode", type="Episode"), Variable(name="withFriends", type="Boolean!")],
             [
                 Query(
                     name="hero",
@@ -396,11 +358,11 @@ fragment comparisonFields on Character {
                                     name="include",
                                     arguments=[
                                         Argument(name="if", value=Variable(name="withFriends", type="Boolean!"))
-                                    ]
+                                    ],
                                 )
-                            ]
-                        )
-                    ]
+                            ],
+                        ),
+                    ],
                 ),
             ],
             [],
@@ -418,7 +380,7 @@ fragment comparisonFields on Character {
       name
     }
   }
-}'''
+}''',
         ),
         # mutation {
         #   addContent(
@@ -445,7 +407,8 @@ fragment comparisonFields on Character {
         #   }
         # }
         (
-            "mutation", None,
+            "mutation",
+            None,
             [],
             [
                 Query(
@@ -464,19 +427,19 @@ fragment comparisonFields on Character {
                                         value=[
                                             [
                                                 Argument(name="title", value='"lesson title"'),
-                                                Argument(name="filePath", value='"static-resource-path"')
+                                                Argument(name="filePath", value='"static-resource-path"'),
                                             ],
                                             [
                                                 Argument(name="title", value='"lesson title 2"'),
-                                                Argument(name="filePath", value='"static-resource-path 2"')
-                                            ]
-                                        ]
+                                                Argument(name="filePath", value='"static-resource-path 2"'),
+                                            ],
+                                        ],
                                     ),
                                 ]
-                            ]
+                            ],
                         ),
                     ],
-                    fields=["success"]
+                    fields=["success"],
                 )
             ],
             [],
@@ -503,9 +466,9 @@ fragment comparisonFields on Character {
   ) {
     success
   }
-}"""
-        )
-    ]
+}""",
+        ),
+    ],
 )
 def test_operation(
     type: str,
@@ -513,14 +476,8 @@ def test_operation(
     variables: List[Variable],
     queries: List[Query],
     fragments: List[Fragment],
-    result: str
+    result: str,
 ):
-    operation = Operation(
-        type=type,
-        name=name,
-        variables=variables,
-        queries=queries,
-        fragments=fragments
-    )
+    operation = Operation(type=type, name=name, variables=variables, queries=queries, fragments=fragments)
 
     assert operation.render() == result
