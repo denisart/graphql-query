@@ -50,6 +50,7 @@ dev = [
     "ruff",
     "pylint-pydantic",
     "wheel",
+    "black",
 ]
 
 # all requirements for tests
@@ -66,3 +67,16 @@ docs = [
     "sphinx-argparse",
     "sphinxcontrib-github",
 ]
+
+[tool.ruff]
+line-length = 120
+flake8-quotes = {inline-quotes = 'single', multiline-quotes = 'double'}
+mccabe = { max-complexity = 14 }
+isort = { known-first-party = ['graphql_core', 'tests'] }
+target-version = "py37"
+
+[tool.black]
+color = true
+line-length = 120
+target-version = ['py310']
+skip-string-normalization = true

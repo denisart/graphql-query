@@ -16,6 +16,16 @@ generate-requirements:
 	pip-compile --extra=test --resolver=backtracking --output-file=requirements/requirements-test.txt pyproject.toml
 	pip-compile --extra=docs --resolver=backtracking --output-file=requirements/requirements-docs.txt pyproject.toml
 
+.PHONY: format
+format:
+	black $(sources)
+	ruff --fix $(sources)
+
+.PHONY: lint
+lint:
+	ruff $(sources)
+	black $(sources) --check --diff
+
 .PHONY: clean
 clean:
 	rm -rf `find . -name __pycache__`
