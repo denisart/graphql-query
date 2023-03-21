@@ -1,6 +1,7 @@
 import os
+import sys
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from graphql import assert_name
 from jinja2 import Environment, FileSystemLoader, Template
@@ -8,13 +9,31 @@ from pydantic import BaseModel
 from pydantic import Field as PydanticField
 from pydantic import validator
 
+if sys.version_info >= (3, 10):
+    from typing import TypeGuard
+else:
+    # Use TypeGuard from typing_extensions for python <= 3.9
+    from typing_extensions import TypeGuard
+
+__all__ = [
+    "Variable",
+    "Argument",
+    "Directive",
+    "Field",
+    "InlineFragment",
+    "Fragment",
+    "Query",
+    "Operation",
+]
+
+
 # templates setting for render of classes
 TEMPLATES_FOLDER = Path(os.path.join(os.path.dirname(__file__), "templates/"))
 
 template_env = Environment(loader=FileSystemLoader(searchpath=TEMPLATES_FOLDER))
 
 
-class GraphQL2PythonQuery(BaseModel):
+class _GraphQL2PythonQuery(BaseModel):
     """An abstract class for GraphQL query type."""
 
     class Config:
@@ -41,38 +60,34 @@ class GraphQL2PythonQuery(BaseModel):
         raise NotImplementedError
 
 
-class Variable(GraphQL2PythonQuery):
-    """GraphQL variable type. See https://graphql.org/learn/queries/#variables
+class Variable(_GraphQL2PythonQuery):
+    """GraphQL variable type.
 
-    :param name: The name of variable.
-    :type name: str
-    :param type: The GraphQL type of variable.
-    :type type: str
-    :param default: The optional default value for variable.
-    :type default: str or None
+    See https://graphql.org/learn/queries/#variables for more details.
 
-    :Example:
+    Attributes:
+        name: A name of the variable.
+        type: A GraphQL type of the variable.
+        default: A default value for the variable.
 
-        The query
+    Example:
 
-        .. code-block:: python
+        In the query
 
-            '''
-            query HeroNameAndFriends($episode: Episode = JEDI) {
-              hero(episode: $episode) {
-                name
-                friends {
-                  name
-                }
-              }
-            }
-            '''
+        >>> query_str = '''
+        ... query HeroNameAndFriends($episode: Episode = JEDI) {
+        ...   hero(episode: $episode) {
+        ...     name
+        ...     friends {
+        ...       name
+        ...     }
+        ...   }
+        ... }
+        ... '''
 
-        has the following variable:
+        we have the following variable:
 
-        .. code-block:: python
-
-            episode = Variable(name="episode", type="Episode", default="JEDI")
+        >>> var_episode = Variable(name="episode", type="Episode", default="JEDI")
 
     """
 
@@ -83,78 +98,71 @@ class Variable(GraphQL2PythonQuery):
     _template: Template = template_env.get_template("variable.jinja2")
 
     @validator("name")
-    def graphql_variable_name(cls, name: str):
+    def graphql_variable_name(cls, name: str) -> str:
         return assert_name(name)
 
     def render(self) -> str:
         return self._template.render(name=self.name, type=self.type, default=self.default)
 
 
-class Argument(GraphQL2PythonQuery):
-    """GraphQL argument type. See https://graphql.org/learn/queries/#arguments
+class Argument(_GraphQL2PythonQuery):
+    """GraphQL argument type.
 
-    :param name: The name of an argument.
-    :type name: str
-    :param value: An argument value.
-    :type value: Union[str, Argument, List[Argument], Variable]
+    See https://graphql.org/learn/queries/#arguments for more details.
 
-    :Example 1:
+    Attributes:
+        name: A name of the argument.
+        value: The argument value.
+
+    Example 1:
 
         In the query
 
-        .. code-block:: python
-
-            '''
-            {
-              human(id: "1000") {
-                name
-                height(unit: FOOT)
-              }
-            }
-            '''
+        >>> query_string = '''
+        ... {
+        ...   human(id: "1000") {
+        ...     name
+        ...     height(unit: FOOT)
+        ...   }
+        ... }
+        ... '''
 
         we have two arguments
 
-        .. code-block:: python
+        >>> arg_id = Argument(name="id", value='"1000"')
+        >>> arg_unit = Argument(name="unit", value='FOOT')
 
-            arg_id = Argument(name="id", value='"1000"')
-            arg_unit = Argument(name="unit", value='FOOT')
-
-    :Example 2:
+    Example 2:
 
         In the query
 
-        .. code-block:: python
+        >>> query_string = '''
+        ... {
+        ...   q(
+        ...     filter1: {
+        ...       filter2: {
+        ...         field1: "value1"
+        ...          field2: VALUE2
+        ...        }
+        ...      }
+        ...   ) {
+        ...     ...
+        ...   }
+        ... }
+        ... '''
 
-            '''
-            {
-              q(
-                filter1: {
-                  filter2: {
-                    field1: "value1"
-                     field2: VALUE2
-                   }
-                 }
-              ) {
-                ...
-              }
-            }
-            '''
+        we have the long argument
 
-        we have the argument
-
-        .. code-block:: python
-
-            filter1 = Argument(
-                name="filter1",
-                value=Argument(
-                    name="filter2",
-                    value=[
-                        Argument(name="field1", value='"value1"'),
-                        Argument(name="field2", value='VALUE2'),
-                    ]
-                )
-            )
+        >>> filter1 = Argument(
+        ...     name="filter1",
+        ...     value=Argument(
+        ...         name="filter2",
+        ...         value=[
+        ...             Argument(name="field1", value='"value1"'),
+        ...             Argument(name="field2", value='VALUE2'),
+        ...         ]
+        ...     )
+        ... )
 
     """
 
@@ -178,8 +186,24 @@ class Argument(GraphQL2PythonQuery):
     _template_key_objects: Template = template_env.get_template("argument_key_objects.jinja2")
 
     @validator("name")
-    def graphql_argument_name(cls, name: str):
+    def graphql_argument_name(cls, name: str) -> str:
         return assert_name(name)
+
+    @staticmethod
+    def _check_is_list_of_str(values: List[Any]) -> TypeGuard[List[str]]:
+        return all(isinstance(value, str) for value in values)
+
+    @staticmethod
+    def _check_is_list_of_int(values: List[Any]) -> TypeGuard[List[int]]:
+        return all(isinstance(value, Argument) for value in values)
+
+    @staticmethod
+    def _check_is_list_of_arguments(values: List[Any]) -> TypeGuard[List['Argument']]:
+        return all(isinstance(value, Argument) for value in values)
+
+    @staticmethod
+    def _check_is_list_of_list(values: List[Any]) -> TypeGuard[List[List[Any]]]:
+        return all(isinstance(value, list) for value in values)
 
     def _render_for_str(self, name: str, value: str) -> str:
         return self._template_key_value.render(name=name, value=value)
@@ -213,7 +237,6 @@ class Argument(GraphQL2PythonQuery):
         return self._template_key_variable.render(name=name, value=value.name)
 
     def render(self) -> str:
-        # pylint: disable=too-many-return-statements
         if isinstance(self.value, str):
             return self._render_for_str(self.name, self.value)
 
@@ -226,63 +249,56 @@ class Argument(GraphQL2PythonQuery):
         if isinstance(self.value, Variable):
             return self._render_for_variable(self.name, self.value)
 
-        if isinstance(self.value, list) and (len(self.value) == 0):
-            return self._render_for_list_str(self.name, self.value)  # type: ignore
+        if isinstance(self.value, list):
+            if self._check_is_list_of_str(self.value):
+                return self._render_for_list_str(self.name, self.value)
 
-        if isinstance(self.value, list) and isinstance(self.value[0], Argument):
-            # self.value is List[Argument]
-            return self._render_for_list_argument(self.name, self.value)  # type: ignore
+            if self._check_is_list_of_arguments(self.value):
+                return self._render_for_list_argument(self.name, self.value)
 
-        if isinstance(self.value, list) and isinstance(self.value[0], str):
-            # self.value is List[str]
-            return self._render_for_list_str(self.name, self.value)  # type: ignore
+            if self._check_is_list_of_int(self.value):
+                return self._render_for_list_int(self.name, self.value)
 
-        if isinstance(self.value, list) and isinstance(self.value[0], int):
-            # self.value is List[str]
-            return self._render_for_list_int(self.name, self.value)  # type: ignore
+            if self._check_is_list_of_list(self.value):
+                if all(self._check_is_list_of_arguments(v) for v in self.value):
+                    return self._render_for_list_list_argument(self.name, self.value)
 
-        # self.value is List[List[Argument]]
-        return self._render_for_list_list_argument(self.name, self.value)  # type: ignore
+        raise ValueError("Invalid type for `graphql_query.Argument.value`.")
 
 
-class Directive(GraphQL2PythonQuery):
-    """GraphQL directive type. See https://graphql.org/learn/queries/#directives
+class Directive(_GraphQL2PythonQuery):
+    """GraphQL directive type.
 
-    :param name: The directive name.
-    :type name: str
-    :param arguments: The directive arguments.
-    :type arguments: List[Argument]
+    See https://graphql.org/learn/queries/#directives for more details.
 
-    :Example:
+    Attributes:
+        name: A directive name.
+        arguments: Directive arguments.
+
+    Example:
 
         In the query
 
-        .. code-block:: python
+        >>> query_str = '''
+        ... query Hero($episode: Episode, $withFriends: Boolean!) {
+        ...   hero(episode: $episode) {
+        ...     name
+        ...     friends @include(if: $withFriends) {
+        ...       name
+        ...     }
+        ...   }
+        ... }
+        ... '''
 
-            '''
-            query Hero($episode: Episode, $withFriends: Boolean!) {
-              hero(episode: $episode) {
-                name
-                friends @include(if: $withFriends) {
-                  name
-                }
-              }
-            }
-            '''
+        we have the directive
 
-        we have a directive
-
-        .. code-block:: python
-
-            Directive(
-                name="include",
-                arguments=[
-                    Argument(
-                        name="if",
-                        value=Variable(name="withFriends", ...)
-                    )
-                ]
-            )
+        >>> var_with_friends = Variable(name="withFriends", type="Boolean!")
+        >>> directive_if = Directive(
+        ...     name="include",
+        ...     arguments=[
+        ...         Argument(name="if", value=var_with_friends)
+        ...     ]
+        ... )
 
     """
 
@@ -292,7 +308,7 @@ class Directive(GraphQL2PythonQuery):
     _template_directive: Template = template_env.get_template("directive.jinja2")
 
     @validator("name")
-    def graphql_directive_name(cls, name: str):
+    def graphql_directive_name(cls, name: str) -> str:
         return assert_name(name)
 
     def render(self) -> str:
@@ -301,56 +317,54 @@ class Directive(GraphQL2PythonQuery):
         )
 
 
-class Field(GraphQL2PythonQuery):
-    """GraphQL Field type. See https://graphql.org/learn/queries/#fields
+class Field(_GraphQL2PythonQuery):
+    """GraphQL Field type.
 
-    :param name: Field name.
-    :type name: str
-    :param alias: Field alias.
-    :type alias: str or None
-    :param arguments: All arguments for the field.
-    :type arguments: List[Argument]
-    :param fields: Sub-fields for the field.
-    :type fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
-    :param directives: All field directives.
-    :type directives: List[Directive]
-    :param typename: Add meta field __typename to sub-fields.
-    :type typename: bool
+    See https://graphql.org/learn/queries/#fields for more details.
+
+    Attributes:
+        name: The field name.
+        alias: The field alias.
+        arguments: All arguments for the field.
+        fields: All sub-fields for the field.
+        directives: All field directives.
+        typename: Add meta field `__typename` to sub-fields.
 
     Example:
+
         In the query
 
         .. code-block:: python
 
-            {
-              query {
-                field1 {
-                  __typename
-                  field2 {
-                    __typename
-                    f1
-                    f2
-                    f3
-                  }
-                }
-              }
-            }
+        >>> query_string = '''
+        ... {
+        ...   query {
+        ...     field1 {
+        ...       __typename
+        ...       field2 {
+        ...         __typename
+        ...         f1
+        ...         f2
+        ...         f3
+        ...       }
+        ...     }
+        ...   }
+        ... }
+        ... '''
 
-        we have the following field
+        we have the following fields
 
-        .. code-block:: python
-
-            Field(
-                name="field1",
-                fields=[
-                    Field(
-                        name="field2",
-                        fields=["f1", "f2", "f3"],
-                        typename=True
-                    )
-                ],
-                typename=True
-            )
+        >>> Field(
+        ...     name="field1",
+        ...     fields=[
+        ...         Field(
+        ...             name="field2",
+        ...             fields=["f1", Field(name="f2"), "f3"],
+        ...             typename=True
+        ...         )
+        ...     ],
+        ...     typename=True
+        ... )
 
     """
 
@@ -359,16 +373,16 @@ class Field(GraphQL2PythonQuery):
     arguments: List[Argument] = PydanticField(default_factory=list)
     fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
     directives: List[Directive] = PydanticField(default_factory=list)
-    typename: bool = PydanticField(default=False, description="add meta field __typename to sub-fields")
+    typename: bool = PydanticField(default=False, description="Add meta field `__typename` to sub-fields.")
 
     _template: Template = template_env.get_template("field.jinja2")
 
     @validator("name")
-    def graphql_field_name(cls, name: str):
+    def graphql_field_name(cls, name: str) -> str:
         return assert_name(name)
 
     @validator("alias")
-    def graphql_field_alias(cls, alias: Optional[str]):
+    def graphql_field_alias(cls, alias: Optional[str]) -> Optional[str]:
         if alias is not None:
             return assert_name(alias)
         return alias
@@ -384,57 +398,53 @@ class Field(GraphQL2PythonQuery):
         )
 
 
-class InlineFragment(GraphQL2PythonQuery):
-    """Inline Fragment GraphQL type. See
-    https://graphql.org/learn/queries/#inline-fragments
+class InlineFragment(_GraphQL2PythonQuery):
+    """Inline Fragment GraphQL type.
 
-    :param type: GraphQL type for the inline fragment.
-    :type type: str
-    :param arguments: All arguments for the field.
-    :type arguments: List[Argument]
-    :param fields: Sub-fields for the field.
-    :type fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
-    :param typename: Add meta field __typename to sub-fields.
-    :type typename: bool
+    See https://graphql.org/learn/queries/#inline-fragments for more details.
 
-    :Example:
+    Attributes:
+        type: A GraphQL type for the inline fragment.
+        arguments: All arguments for the inline fragment.
+        fields: All sub-fields for the inline fragment.
+        typename: Add meta field `__typename` to sub-fields.
+
+    Example:
 
         In the query
 
-        .. code-block:: python
+        >>> query_string = '''
+        ... query HeroForEpisode($ep: Episode!) {
+        ...   hero(episode: $ep) {
+        ...     name
+        ...     ... on Droid {
+        ...       primaryFunction
+        ...     }
+        ...     ... on Human {
+        ...       height
+        ...     }
+        ...   }
+        ... }
+        ... '''
 
-            '''
-            query HeroForEpisode($ep: Episode!) {
-              hero(episode: $ep) {
-                name
-                ... on Droid {
-                  primaryFunction
-                }
-                ... on Human {
-                  height
-                }
-              }
-            }
-            '''
+        we have two inline fragments
 
-        we have the following inline fragments
-
-        .. code-block:: python
-
-            droid = InlineFragment(type="Droid", fields=["primaryFunction"])
-            human = InlineFragment(type="Human", fields=["height"])
+        >>> inline_fragment_droid = InlineFragment(type="Droid", fields=["primaryFunction"])
+        >>> inline_fragment_human = InlineFragment(type="Human", fields=["height"])
 
     """
 
     type: str
     arguments: List[Argument] = PydanticField(default_factory=list)
     fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
-    typename: bool = PydanticField(default=False, description="add meta field __typename to sub-fields")
+    typename: bool = PydanticField(default=False, description="Add meta field `__typename` to sub-fields.")
 
     _template: Template = template_env.get_template("inline_fragment.jinja2")
 
     @validator("fields")
-    def graphql_inline_fragment_fields(cls, fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]):
+    def graphql_inline_fragment_fields(
+        cls, fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
+    ) -> List[Union[str, 'Field', 'InlineFragment', 'Fragment']]:
         if len(fields) == 0:
             raise ValueError("empty fields for this inline fragment")
         return fields
@@ -448,68 +458,65 @@ class InlineFragment(GraphQL2PythonQuery):
         )
 
 
-class Fragment(GraphQL2PythonQuery):
-    """GraphQL fragment type. See
-    https://graphql.org/learn/queries/#fragments
+class Fragment(_GraphQL2PythonQuery):
+    """GraphQL fragment type.
 
+    See https://graphql.org/learn/queries/#fragments for more details.
 
-    :param name: Fragment name.
-    :type name: str
-    :param type: GraphQL type for the fragment.
-    :type type: str
-    :param fields: All sub-fields for the fragment.
-    :type fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
-    :param typename: Add meta field __typename to sub-fields.
-    :type typename: bool
+    Attributes:
+        name: The fragment name.
+        type: A GraphQL type for the fragment.
+        fields: All sub-fields for the fragment.
+        typename: Add meta field `__typename` to sub-fields.
 
-    :Example:
+    Example:
 
         In the query
 
-        .. code-block:: python
-
-            {
-              leftComparison: hero(episode: EMPIRE) {
-                ...comparisonFields
-              }
-              rightComparison: hero(episode: JEDI) {
-                ...comparisonFields
-              }
-            }
-
-            fragment comparisonFields on Character {
-              name
-              appearsIn
-              friends {
-                name
-              }
-            }
+        >>> query_string = '''
+        ... {
+        ...   leftComparison: hero(episode: EMPIRE) {
+        ...     ...comparisonFields
+        ...   }
+        ...   rightComparison: hero(episode: JEDI) {
+        ...     ...comparisonFields
+        ...   }
+        ... }
+        ...
+        ... fragment comparisonFields on Character {
+        ...   name
+        ...   appearsIn
+        ...   friends {
+        ...     name
+        ...   }
+        ... }
+        ... '''
 
         we have the fragment
 
-        .. code-block:: python
-
-            comparisonFields = Fragment(
-                name="comparisonFields",
-                type="Character",
-                fields=["name", "appearsIn", Field(name="friends", fields=["name"])]
-            )
+        >>> fragment_comparisonFields = Fragment(
+        ...     name="comparisonFields",
+        ...     type="Character",
+        ...     fields=["name", "appearsIn", Field(name="friends", fields=["name"])]
+        ... )
 
     """
 
     name: str
     type: str
     fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
-    typename: bool = PydanticField(default=False, description="add meta field __typename to sub-fields")
+    typename: bool = PydanticField(default=False, description="Add meta field `__typename` to sub-fields")
 
     _template: Template = template_env.get_template("fragment.jinja2")
 
     @validator("name")
-    def graphql_fragment_name(cls, name: str):
+    def graphql_fragment_name(cls, name: str) -> str:
         return assert_name(name)
 
     @validator("fields")
-    def graphql_fragment_fields(cls, fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]):
+    def graphql_fragment_fields(
+        cls, fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
+    ) -> List[Union[str, 'Field', 'InlineFragment', 'Fragment']]:
         if len(fields) == 0:
             raise ValueError("empty fields for this fragment")
         return fields
@@ -523,71 +530,66 @@ class Fragment(GraphQL2PythonQuery):
         )
 
 
-class Query(GraphQL2PythonQuery):
-    """GraphQL query type. See https://graphql.org/learn/queries/
+class Query(_GraphQL2PythonQuery):
+    """GraphQL query type.
 
-    :param name: Query name.
-    :type name: str
-    :param alias: Optional query alias.
-    :type alias: str of None
-    :param arguments: All query arguments.
-    :type arguments: List[Argument]
-    :param typename: Add meta field __typename to the query.
-    :type typename: bool
-    :param fields: All sub-fields for the query.
-    :type fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
+    See https://graphql.org/learn/queries/ for more details.
 
-    :Example:
+    Attributes:
+        name: The query name.
+        alias: An optional query alias.
+        arguments: All query arguments.
+        typename: Add meta field `__typename` to the query.
+        fields: All sub-fields for the query.
 
-        In the query
+    Example:
 
-        .. code-block:: python
+        For the query
 
-            {
-              human: human1000th(id: "1000") {
-                name
-                height
-              }
-            }
+        >>> query_string = '''
+        ... {
+        ...   human: human1000th(id: "1000") {
+        ...     name
+        ...     height
+        ...   }
+        ... }
+        ... '''
 
-        we have the Query
+        we have
 
-        .. code-block:: python
-
-            Query(
-                name="human",
-                alias="human1000th",
-                arguments=[
-                    Argument(
-                        name="id",
-                        value='"1000"'
-                    )
-                ],
-                fields=["name", "height"]
-            )
+        >>> human = Query(
+        ...     name="human",
+        ...     alias="human1000th",
+        ...     arguments=[
+        ...         Argument(name="id", value='"1000"')
+        ...     ],
+        ...     fields=["name", "height"]
+        ... )
 
     """
 
     name: str
     alias: Optional[str] = PydanticField(default=None)
     arguments: List[Argument] = PydanticField(default_factory=list)
-    typename: bool = PydanticField(default=False, description="add meta field __typename to the query")
+    typename: bool = PydanticField(default=False, description="Add meta field `__typename` to the query.")
     fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
 
     _template: Template = template_env.get_template("query.jinja2")
 
     @validator("name")
-    def graphql_query_name(cls, name: str):
+    def graphql_query_name(cls, name: str) -> str:
         return assert_name(name)
 
     @validator("alias")
-    def graphql_alias_alias(cls, alias: Optional[str]):
+    def graphql_alias_alias(cls, alias: Optional[str]) -> Optional[str]:
         if alias is not None:
             return assert_name(alias)
         return alias
 
     @validator("fields")
-    def graphql_query_fields(cls, fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]):
+    def graphql_query_fields(
+        cls, fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
+    ) -> List[Union[str, 'Field', 'InlineFragment', 'Fragment']]:
         if len(fields) == 0:
             raise ValueError("empty fields for this query")
         return fields
@@ -602,57 +604,51 @@ class Query(GraphQL2PythonQuery):
         )
 
 
-class Operation(GraphQL2PythonQuery):
-    """GraphQL operation type. See https://graphql.org/learn/queries/
+class Operation(_GraphQL2PythonQuery):
+    """GraphQL operation type.
 
-    :param type: Operation type.
-    :type type: One of ["query", "mutation", "subscription"]
-    :param name: Optional operation name.
-    :type name: str or None
-    :param variables: All operation variables.
-    :type variables: List[Variable]
-    :param queries: All operation queries.
-    :type queries: List[Query]
-    :param fragments: All fragments for the operation.
-    :type fragments: List[Fragment]
+    See https://graphql.org/learn/queries/ for more details.
 
-    :Example:
+    Attributes:
+        type: A operation type.
+        name: An optional operation name.
+        variables: All operation variables.
+        queries: All operation queries.
+        fragments: All fragments for the operation.
+
+    Example:
 
         For the query
 
-        .. code-block:: python
-
-            '''
-            mutation CreateReviewForEpisode($ep: Episode!, $review: ReviewInput!) {
-              createReview(episode: $ep, review: $review) {
-                stars
-                commentary
-              }
-            }
-            '''
+        >>> query_string = '''
+        ... mutation CreateReviewForEpisode($ep: Episode!, $review: ReviewInput!) {
+        ...   createReview(episode: $ep, review: $review) {
+        ...     stars
+        ...     commentary
+        ...   }
+        ... }
+        ... '''
 
         we have
 
-        .. code-block:: python
-
-            var_ep = Variable(name="ep", type="Episode!")
-            var_review = Variable(name="review", type="ReviewInput!")
-
-            Operation(
-                type="mutation",
-                name="CreateReviewForEpisode",
-                variables=[var_ep, var_review],
-                queries=[
-                    Query(
-                        name="createReview",
-                        arguments=[
-                            Argument(name="episode", value=var_ep),
-                            Argument(name="review", value=var_review),
-                        ],
-                        fields=["stars", "commentary"]
-                    ),
-                ],
-            )
+        >>> var_ep = Variable(name="ep", type="Episode!")
+        >>> var_review = Variable(name="review", type="ReviewInput!")
+        >>>
+        >>> Operation(
+        ...     type="mutation",
+        ...     name="CreateReviewForEpisode",
+        ...     variables=[var_ep, var_review],
+        ...     queries=[
+        ...         Query(
+        ...             name="createReview",
+        ...             arguments=[
+        ...                 Argument(name="episode", value=var_ep),
+        ...                 Argument(name="review", value=var_review),
+        ...             ],
+        ...             fields=["stars", "commentary"]
+        ...         ),
+        ...     ],
+        ... )
 
     """
 
@@ -670,13 +666,13 @@ class Operation(GraphQL2PythonQuery):
     _supported_types = ["query", "mutation", "subscription"]
 
     @validator("name")
-    def graphql_operation_name(cls, name: Optional[str]):
+    def graphql_operation_name(cls, name: Optional[str]) -> Optional[str]:
         if name is not None:
             return assert_name(name)
         return name
 
     @validator("queries")
-    def graphql_queries(cls, queries: List[Query]):
+    def graphql_queries(cls, queries: List[Query]) -> List[Query]:
         if len(queries) == 0:
             raise ValueError("empty queries list for this operation")
         return queries
