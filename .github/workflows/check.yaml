@@ -36,4 +36,5 @@ jobs:
         make testcov
     - name: Build package
       run: |
+        pip install -U twine build packaging
         python -m build
