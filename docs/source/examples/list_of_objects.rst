@@ -112,27 +112,29 @@ The following code it is a simple realisation of this problem
   )
 
   print(target_mutation.render())
-  # mutation {
-  #   addContent(
-  #     title: "ContentTitle"
-  #     description: "content description"
-  #     active: true
-  #     chapters: [
-  #       {
-  #         title: "chapter title"
-  #         lessons: [
-  #           {
-  #             title: "lesson title"
-  #             filePath: "static-resource-path"
-  #           }
-  #           {
-  #             title: "lesson title 2"
-  #             filePath: "static-resource-path2"
-  #           }
-  #         ]
-  #       }
-  #     ]
-  #   ) {
-  #     success
-  #   }
-  # }
+  """
+  mutation {
+    addContent(
+      title: "ContentTitle"
+      description: "content description"
+      active: true
+      chapters: [
+        {
+          title: "chapter title"
+          lessons: [
+            {
+              title: "lesson title"
+              filePath: "static-resource-path"
+            }
+            {
+              title: "lesson title 2"
+              filePath: "static-resource-path2"
+            }
+          ]
+        }
+      ]
+    ) {
+      success
+    }
+  }
+  """

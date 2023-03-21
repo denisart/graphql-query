@@ -1,1 +1,0 @@
-include graphql_query/templates/**.jinja2

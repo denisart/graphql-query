@@ -91,5 +91,7 @@ env/
 venv/
 .mypy_cache/
 .ruff_cache/
+.pytest_cache/
 dist/
 .coverage
+htmlcov/

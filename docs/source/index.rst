@@ -13,7 +13,13 @@ Welcome to GRAPHQL_QUERY documentation!
 .. image:: https://img.shields.io/github/license/denisart/graphql-query
   :alt: license
 
-**graphql_query** is complete GraphQL query code generator for python.
+**graphql_query** is complete GraphQL query string builder for python. With **graphql_query**
+you can
+
+- generate a GraphQL query string from a python class;
+- use and share similar Arguments, Variables and e.t.c between different queries;
+- easily add new fields to your query;
+- add Fragments and Directives to queries;
 
 Documentation for version:  |version|
 

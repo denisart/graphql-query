@@ -6,7 +6,7 @@
 
 ---
 
-**graphql_query** is complete GraphQL query code generator for python. With **graphql_query**
+**graphql_query** is complete GraphQL query string builder for python. With **graphql_query**
 you can
 
 - generate a GraphQL query string from a python class;
@@ -45,11 +45,13 @@ hero = Query(name="hero", fields=["name"])
 operation = Operation(type="query", queries=[hero])
 
 print(operation.render())
-# query {
-#   hero {
-#     name
-#   }
-# }
+"""
+query {
+  hero {
+    name
+  }
+}
+"""
 ```
 
 The `render` method for the `graphql_query.Operation` object
@@ -105,21 +107,23 @@ operation = Operation(
     queries=[hero]
 )
 print(operation.render())
-# query Hero(
-#   $episode: Episode
-#   $withFriends: Boolean!
-# ) {
-#   hero(
-#     episode: $episode
-#   ) {
-#     name
-#     friends @include(
-#       if: $withFriends
-#     ) {
-#       name
-#     }
-#   }
-# }
+"""
+query Hero(
+  $episode: Episode
+  $withFriends: Boolean!
+) {
+  hero(
+    episode: $episode
+  ) {
+    name
+    friends @include(
+      if: $withFriends
+    ) {
+      name
+    }
+  }
+}
+"""
 ```
 
 You can find other examples in the documentation.

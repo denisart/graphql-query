@@ -31,11 +31,13 @@ we can to use **graphql_query.Operation** as like that
   operation = Operation(type="query", queries=[hero])
 
   print(operation.render())
-  # query {
-  #  hero {
-  #    name
-  #  }
-  # }
+  """
+  query {
+    hero {
+      name
+    }
+  }
+  """
 
 Same way for the query with sub-fields
 
@@ -69,14 +71,16 @@ we can to use **graphql_query.Field** as like that
   operation = Operation(type="query", queries=[hero])
 
   print(operation.render())
-  # query {
-  #   hero {
-  #     name
-  #     friends {
-  #       name
-  #     }
-  #   }
-  # }
+  """
+  query {
+    hero {
+      name
+      friends {
+        name
+      }
+    }
+  }
+  """
 
 Arguments
 ---------
@@ -102,16 +106,18 @@ you can using **graphql_query.Argument**:
   operation = Operation(type="query", queries=[human])
 
   print(operation.render())
-  # query {
-  #   human(
-  #     id: "1000"
-  #   ) {
-  #     name
-  #     height(
-  #       unit: FOOT
-  #     )
-  #   }
-  # }
+  """
+  query {
+    human(
+      id: "1000"
+    ) {
+      name
+      height(
+        unit: FOOT
+      )
+    }
+  }
+  """
 
 Aliases
 -------
@@ -138,19 +144,20 @@ Aliases
 
   operation = Operation(type="query", queries=[empireHero, jediHero])
   print(operation.render())
-  # query {
-  #   empireHero: hero(
-  #     episode: EMPIRE
-  #   ) {
-  #     name
-  #   }
-  #
-  #   jediHero: hero(
-  #     episode: JEDI
-  #   ) {
-  #     name
-  #   }
-  # }
+  """
+  query {
+    empireHero: hero(
+      episode: EMPIRE
+    ) {
+      name
+    }
+      jediHero: hero(
+      episode: JEDI
+    ) {
+      name
+    }
+  }
+  """
 
 Fragments
 ---------
@@ -188,27 +195,29 @@ Fragment is the power of GraphQL. Use **graphql_query.Fragment** with
       fragments=[comparisonFields]
   )
   print(operation.render())
-  # query {
-  #   leftComparison: hero(
-  #     episode: EMPIRE
-  #   ) {
-  #     ...comparisonFields
-  #   }
-  #
-  #   rightComparison: hero(
-  #     episode: JEDI
-  #   ) {
-  #     ...comparisonFields
-  #   }
-  # }
-  #
-  # fragment comparisonFields on Character {
-  #   name
-  #   appearsIn
-  #   friends {
-  #     name
-  #   }
-  # }
+  """
+  query {
+    leftComparison: hero(
+      episode: EMPIRE
+    ) {
+      ...comparisonFields
+    }
+
+    rightComparison: hero(
+      episode: JEDI
+    ) {
+      ...comparisonFields
+    }
+  }
+
+  fragment comparisonFields on Character {
+    name
+    appearsIn
+    friends {
+      name
+    }
+  }
+  """
 
 Using variables inside fragments
 --------------------------------
@@ -264,35 +273,37 @@ Variables can also be used in fragments
       variables=[var_first]
   )
   print(operation.render())
-  # query HeroComparison(
-  #   $first: Int = 3
-  # ) {
-  #   leftComparison: hero(
-  #     episode: EMPIRE
-  #   ) {
-  #     ...comparisonFields
-  #   }
-  #
-  #   rightComparison: hero(
-  #     episode: JEDI
-  #   ) {
-  #     ...comparisonFields
-  #   }
-  # }
-  #
-  # fragment comparisonFields on Character {
-  #   name
-  #   friendsConnection(
-  #     first: $first
-  #   ) {
-  #     totalCount
-  #     edges {
-  #       node {
-  #         name
-  #       }
-  #     }
-  #   }
-  # }
+  """
+  query HeroComparison(
+    $first: Int = 3
+  ) {
+    leftComparison: hero(
+      episode: EMPIRE
+    ) {
+      ...comparisonFields
+    }
+
+    rightComparison: hero(
+      episode: JEDI
+    ) {
+      ...comparisonFields
+    }
+  }
+
+  fragment comparisonFields on Character {
+    name
+    friendsConnection(
+      first: $first
+    ) {
+      totalCount
+      edges {
+        node {
+          name
+        }
+      }
+    }
+  }
+  """
 
 Operation name
 --------------
@@ -315,14 +326,16 @@ HeroNameAndFriends as operation name:
       queries=[hero],
   )
   print(operation.render())
-  # query HeroNameAndFriends {
-  #   hero {
-  #     name
-  #     friends {
-  #       name
-  #     }
-  #   }
-  # }
+  """
+  query HeroNameAndFriends {
+    hero {
+      name
+      friends {
+        name
+      }
+    }
+  }
+  """
 
 Directives
 ----------
@@ -360,21 +373,23 @@ If you use directives in your queries then using **graphql_query.Directive**
       variables=[var_episode, var_withFriends]
   )
   print(operation.render())
-  # query Hero(
-  #   $episode: Episode
-  #   $withFriends: Boolean!
-  # ) {
-  #   hero(
-  #     episode: $episode
-  #   ) {
-  #     name
-  #     friends @include(
-  #       if: $withFriends
-  #     ) {
-  #       name
-  #     }
-  #   }
-  # }
+  """
+  query Hero(
+    $episode: Episode
+    $withFriends: Boolean!
+  ) {
+    hero(
+      episode: $episode
+    ) {
+      name
+      friends @include(
+        if: $withFriends
+      ) {
+        name
+      }
+    }
+  }
+  """
 
 Mutations
 ---------
@@ -404,18 +419,20 @@ Creating mutation is the same as creating query
       queries=[createReview],
   )
   print(operation.render())
-  # mutation CreateReviewForEpisode(
-  #   $ep: Episode!
-  #   $review: ReviewInput!
-  # ) {
-  #   createReview(
-  #     episode: $ep
-  #     review: $review
-  #   ) {
-  #     stars
-  #     commentary
-  #   }
-  # }
+  """
+  mutation CreateReviewForEpisode(
+    $ep: Episode!
+    $review: ReviewInput!
+  ) {
+    createReview(
+      episode: $ep
+      review: $review
+    ) {
+      stars
+      commentary
+    }
+  }
+  """
 
 Inline Fragments
 ----------------
@@ -447,21 +464,23 @@ For union types you can using inline fragments https://graphql.org/learn/queries
       queries=[hero],
   )
   print(operation.render())
-  # query HeroForEpisode(
-  #   $ep: Episode!
-  # ) {
-  #   hero(
-  #     episode: $ep
-  #   ) {
-  #     stars
-  #     ... on Droid {
-  #       primaryFunction
-  #     }
-  #     ... on Human {
-  #       height
-  #     }
-  #   }
-  # }
+  """
+  query HeroForEpisode(
+    $ep: Episode!
+  ) {
+    hero(
+      episode: $ep
+    ) {
+      stars
+      ... on Droid {
+        primaryFunction
+      }
+      ... on Human {
+        height
+      }
+    }
+  }
+  """
 
 Meta fields
 -----------
@@ -488,22 +507,24 @@ Typename of fields
       queries=[search],
   )
   print(operation.render())
-  # query {
-  #   search(
-  #     text: "an"
-  #   ) {
-  #     __typename
-  #     ... on Droid {
-  #       name
-  #     }
-  #     ... on Human {
-  #       name
-  #     }
-  #     ... on Starship {
-  #       name
-  #     }
-  #   }
-  # }
+  """
+  query {
+    search(
+      text: "an"
+    ) {
+      __typename
+      ... on Droid {
+        name
+      }
+      ... on Human {
+        name
+      }
+      ... on Starship {
+        name
+      }
+    }
+  }
+  """
 
 Argument as list of objects
 ---------------------------
@@ -583,27 +604,29 @@ You can to render this case as well
   operation = Operation(type="mutation", queries=[addContent])
 
   print(operation.render())
-  # mutation {
-  #   addContent(
-  #     title: "ContentTitle"
-  #     description: "content description"
-  #     active: true
-  #     chapters: [
-  #       {
-  #         title: "chapter title"
-  #         lessons: [
-  #           {
-  #             title: "lesson title"
-  #             filePath: "static-resource-path"
-  #           }
-  #           {
-  #             title: "lesson title 2"
-  #             filePath: "static-resource-path 2"
-  #           }
-  #         ]
-  #       }
-  #     ]
-  #   ) {
-  #     success
-  #   }
-  # }
+  """
+  mutation {
+    addContent(
+      title: "ContentTitle"
+      description: "content description"
+      active: true
+      chapters: [
+        {
+          title: "chapter title"
+          lessons: [
+            {
+              title: "lesson title"
+              filePath: "static-resource-path"
+            }
+            {
+              title: "lesson title 2"
+              filePath: "static-resource-path 2"
+            }
+          ]
+        }
+      ]
+    ) {
+      success
+    }
+  }
+  """

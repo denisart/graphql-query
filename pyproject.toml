@@ -11,6 +11,11 @@ description = "Complete GraphQL query string generation for python."
 authors = [
     {name = "Denis A. Artyushin", email = "artyushinden@gmail.com"},
 ]
+keywords = [
+    "python", "graphql", "graphql-query",
+    "query-builder", "code-generation", "codegen",
+    "query-generator", "graphql-query-builder", "query-generation",
+]
 license = "MIT"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
