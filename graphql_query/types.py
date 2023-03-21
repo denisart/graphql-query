@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from typing import Any, List, Optional, Union
 
@@ -8,9 +9,10 @@ from pydantic import BaseModel
 from pydantic import Field as PydanticField
 from pydantic import validator
 
-try:
+if sys.version_info >= (3, 10):
     from typing import TypeGuard
-except ImportError:
+else:
+    # Use TypeGuard from typing_extensions for python <= 3.9
     from typing_extensions import TypeGuard
 
 __all__ = [
@@ -261,7 +263,7 @@ class Argument(_GraphQL2PythonQuery):
                 if all(self._check_is_list_of_arguments(v) for v in self.value):
                     return self._render_for_list_list_argument(self.name, self.value)
 
-        raise ValueError
+        raise ValueError("Invalid type for `graphql_query.Argument.value`.")
 
 
 class Directive(_GraphQL2PythonQuery):
