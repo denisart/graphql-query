@@ -26,6 +26,22 @@ lint:
 	ruff $(sources)
 	black $(sources) --check --diff
 
+.PHONY: typecheck
+typecheck:
+	mypy graphql_query
+
+.PHONY: testcov
+testcov: test
+	@echo "building coverage html"
+	@coverage html
+
+.PHONY: test
+test:
+	coverage run -m pytest --durations=10
+
+.PHONY: all
+all: lint typecheck testcov
+
 .PHONY: clean
 clean:
 	rm -rf `find . -name __pycache__`
