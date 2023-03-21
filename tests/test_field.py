@@ -4,8 +4,16 @@ import pytest
 
 from graphql_query import Argument, Directive, Field, Fragment, InlineFragment, Variable
 
-from .data import (arg_1, arg_2, field_friends, field_friends_connection, field_height, field_node, field_simple,
-                   field_simple_typename)
+from .data import (
+    arg_1,
+    arg_2,
+    field_friends,
+    field_friends_connection,
+    field_height,
+    field_node,
+    field_simple,
+    field_simple_typename,
+)
 
 
 @pytest.mark.parametrize(
@@ -27,9 +35,9 @@ from .data import (arg_1, arg_2, field_friends, field_friends_connection, field_
       name
     }
   }
-}"""
+}""",
         ),
-    ]
+    ],
 )
 def test_field_from_data(field: Field, result: str):
     assert field.render() == result
@@ -40,20 +48,14 @@ def test_field_from_data(field: Field, result: str):
     [
         ("name", None, [], [], False, "name"),
         ("name", "my_name", [], [], False, "my_name: name"),
-        (
-            "field",
-            None,
-            [arg_1, arg_2],
-            [],
-            False,
-            "field(\n  arg1: VALUE1\n  arg2: VALUE2\n)"
-        ),
+        ("field", None, [arg_1, arg_2], [], False, "field(\n  arg1: VALUE1\n  arg2: VALUE2\n)"),
         (
             "field",
             None,
             [Argument(name="filter", value=[arg_1, arg_2])],
-            [], False,
-            "field(\n  filter: {\n    arg1: VALUE1\n    arg2: VALUE2\n  }\n)"
+            [],
+            False,
+            "field(\n  filter: {\n    arg1: VALUE1\n    arg2: VALUE2\n  }\n)",
         ),
         (
             "field1",
@@ -61,7 +63,7 @@ def test_field_from_data(field: Field, result: str):
             [],
             [field_simple_typename],
             True,
-            "field1 {\n  __typename\n  field {\n    __typename\n    f1\n    f2\n    f3\n  }\n}"
+            "field1 {\n  __typename\n  field {\n    __typename\n    f1\n    f2\n    f3\n  }\n}",
         ),
         (
             "field1",
@@ -69,9 +71,9 @@ def test_field_from_data(field: Field, result: str):
             [],
             [Fragment(name="MyFragment", type="MyType", fields=["f1"])],
             True,
-            "field1 {\n  __typename\n  ...MyFragment\n}"
-        )
-    ]
+            "field1 {\n  __typename\n  ...MyFragment\n}",
+        ),
+    ],
 )
 def test_field(
     name: str,
@@ -79,15 +81,9 @@ def test_field(
     arguments: List[Argument],
     fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']],
     typename: bool,
-    result: str
+    result: str,
 ):
-    field = Field(
-        name=name,
-        alias=alias,
-        arguments=arguments,
-        fields=fields,
-        typename=typename
-    )
+    field = Field(name=name, alias=alias, arguments=arguments, fields=fields, typename=typename)
     assert field.render() == result
 
 
@@ -97,19 +93,19 @@ def test_field_with_directive():
         fields=["name"],
         directives=[
             Directive(
-                name="include",
-                arguments=[
-                    Argument(name="if", value=Variable(name="withFriends", type="Boolean!"))
-                ]
+                name="include", arguments=[Argument(name="if", value=Variable(name="withFriends", type="Boolean!"))]
             )
-        ]
+        ],
     )
 
-    assert field.render() == '''friends @include(
+    assert (
+        field.render()
+        == '''friends @include(
   if: $withFriends
 ) {
   name
 }'''
+    )
 
 
 def test_field_with_two_directives():
@@ -117,21 +113,18 @@ def test_field_with_two_directives():
         name="friends",
         fields=["name"],
         directives=[
-            Directive(
-                name="include",
-                arguments=[Argument(name="if", value="true")]
-            ),
-            Directive(
-                name="skip",
-                arguments=[Argument(name="if", value="false")]
-            )
-        ]
+            Directive(name="include", arguments=[Argument(name="if", value="true")]),
+            Directive(name="skip", arguments=[Argument(name="if", value="false")]),
+        ],
     )
 
-    assert field.render() == '''friends @include(
+    assert (
+        field.render()
+        == '''friends @include(
   if: true
 ) @skip(
   if: false
 ) {
   name
 }'''
+    )

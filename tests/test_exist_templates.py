@@ -28,7 +28,7 @@ from graphql_query.types import template_env
         "query.jinja2",
         # for Operation
         "operation.jinja2",
-    ]
+    ],
 )
 def test_exist_templates_for_query(template_name: str):
     tpl = template_env.get_template(template_name)

@@ -39,7 +39,7 @@ autodoc_default_options = {
     'inherited-members': False,
     'special-members': '__init__',
     'undoc-members': True,
-    'show-inheritance': True
+    'show-inheritance': True,
 }
 
 autosummary_generate = True

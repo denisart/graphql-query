@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.7", "3.8", "3.9", "3.10", "3.11" ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11" ]
 
     steps:
     - uses: actions/checkout@v3
@@ -23,16 +23,18 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install package in dev mode
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install -r requirements.txt
-        python -m pip install -e ."[dev, test]"
+        python -m pip install -r requirements/requirements-dev.txt
+        python -m pip install -r requirements/requirements-test.txt
     - name: Code style check
       run: |
-        python -m pylint --load-plugins pylint_pydantic --extension-pkg-whitelist='pydantic' graphql_query
-        python -m mypy graphql_query
+        make lint
+    - name: Type check
+      run: |
+        make typecheck
     - name: Tests
       run: |
-        python -m pytest tests/
+        make testcov
     - name: Build package
       run: |
-        python setup.py bdist_wheel
+        pip install -U twine build packaging
+        python -m build
