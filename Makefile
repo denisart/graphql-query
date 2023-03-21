@@ -4,40 +4,40 @@ sources = graphql_query/ tests/ docs/source
 .PHONY: install
 install:
 	python -m pip install -U pip
-	pip install -r requirements/requirements.txt
-	pip install -e ."[dev, test, docs]"
+	python -m pip install -r requirements/requirements.txt
+	python -m pip install -e ."[dev, test, docs]"
 
 .PHONY: generate-requirements
 generate-requirements:
 	@echo "Updating requirements/*.txt files using pip-compile"
 	find requirements/ -name '*.txt' ! -name 'all.txt' -type f -delete
-	pip-compile --resolver=backtracking --output-file=requirements/requirements.txt pyproject.toml
-	pip-compile --extra=dev --resolver=backtracking --output-file=requirements/requirements-dev.txt pyproject.toml
-	pip-compile --extra=test --resolver=backtracking --output-file=requirements/requirements-test.txt pyproject.toml
-	pip-compile --extra=docs --resolver=backtracking --output-file=requirements/requirements-docs.txt pyproject.toml
+	python -m pip-compile --resolver=backtracking --output-file=requirements/requirements.txt pyproject.toml
+	python -m pip-compile --extra=dev --resolver=backtracking --output-file=requirements/requirements-dev.txt pyproject.toml
+	python -m pip-compile --extra=test --resolver=backtracking --output-file=requirements/requirements-test.txt pyproject.toml
+	python -m pip-compile --extra=docs --resolver=backtracking --output-file=requirements/requirements-docs.txt pyproject.toml
 
 .PHONY: format
 format:
-	black $(sources)
-	ruff --fix $(sources)
+	python -m black $(sources)
+	python -m ruff --fix $(sources)
 
 .PHONY: lint
 lint:
-	ruff $(sources)
-	black $(sources) --check --diff
+	python -m ruff $(sources)
+	python -m black $(sources) --check --diff
 
 .PHONY: typecheck
 typecheck:
-	mypy graphql_query
+	python -m mypy graphql_query
 
 .PHONY: testcov
 testcov: test
 	@echo "building coverage html"
-	@coverage html
+	@python -m coverage html
 
 .PHONY: test
 test:
-	coverage run -m pytest --durations=10
+	python -m coverage run -m pytest --durations=10
 
 .PHONY: all
 all: lint typecheck testcov
