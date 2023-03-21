@@ -4,8 +4,8 @@ sources = graphql_query/ tests/ docs/source
 .PHONY: install
 install:
 	python -m pip install -U pip
-	pip install -r requirements.txt
-	pip install -e .
+	pip install -r requirements/requirements.txt
+	pip install -e ."[dev, test, docs]"
 
 .PHONY: generate-requirements
 generate-requirements:
