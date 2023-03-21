@@ -7,37 +7,37 @@ install:
 	python -m pip install -r requirements/requirements.txt
 	python -m pip install -e ."[dev, test, docs]"
 
-.PHONY: generate-requirements
-generate-requirements:
+.PHONY: requirements-build
+requirements-build:
 	@echo "Updating requirements/*.txt files using pip-compile"
 	find requirements/ -name '*.txt' ! -name 'all.txt' -type f -delete
-	python -m pip-compile --resolver=backtracking --output-file=requirements/requirements.txt pyproject.toml
-	python -m pip-compile --extra=dev --resolver=backtracking --output-file=requirements/requirements-dev.txt pyproject.toml
-	python -m pip-compile --extra=test --resolver=backtracking --output-file=requirements/requirements-test.txt pyproject.toml
-	python -m pip-compile --extra=docs --resolver=backtracking --output-file=requirements/requirements-docs.txt pyproject.toml
+	pip-compile --resolver=backtracking --output-file=requirements/requirements.txt pyproject.toml
+	pip-compile --extra=dev --resolver=backtracking --output-file=requirements/requirements-dev.txt pyproject.toml
+	pip-compile --extra=test --resolver=backtracking --output-file=requirements/requirements-test.txt pyproject.toml
+	pip-compile --extra=docs --resolver=backtracking --output-file=requirements/requirements-docs.txt pyproject.toml
 
 .PHONY: format
 format:
-	python -m black $(sources)
-	python -m ruff --fix $(sources)
+	black $(sources)
+	ruff --fix $(sources)
 
 .PHONY: lint
 lint:
-	python -m ruff $(sources)
-	python -m black $(sources) --check --diff
+	ruff $(sources)
+	black $(sources) --check --diff
 
 .PHONY: typecheck
 typecheck:
-	python -m mypy graphql_query
+	mypy graphql_query
 
 .PHONY: testcov
 testcov: test
 	@echo "building coverage html"
-	@python -m coverage html
+	@coverage html
 
 .PHONY: test
 test:
-	python -m coverage run -m pytest --durations=10
+	coverage run -m pytest --durations=10
 
 .PHONY: all
 all: lint typecheck testcov

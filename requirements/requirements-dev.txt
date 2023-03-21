@@ -6,6 +6,10 @@
 #
 astroid==2.15.0
     # via pylint
+black==23.1.0
+    # via graphql_query (pyproject.toml)
+click==8.1.3
+    # via black
 dill==0.3.6
     # via pylint
 graphql-core==3.2.3
@@ -23,9 +27,17 @@ mccabe==0.7.0
 mypy==1.1.1
     # via graphql_query (pyproject.toml)
 mypy-extensions==1.0.0
-    # via mypy
+    # via
+    #   black
+    #   mypy
+packaging==23.0
+    # via black
+pathspec==0.11.1
+    # via black
 platformdirs==3.1.1
-    # via pylint
+    # via
+    #   black
+    #   pylint
 pydantic==1.10.6
     # via
     #   graphql_query (pyproject.toml)
@@ -42,6 +54,7 @@ ruff==0.0.257
     # via graphql_query (pyproject.toml)
 tomli==2.0.1
     # via
+    #   black
     #   mypy
     #   pylint
 tomlkit==0.11.6
