@@ -51,3 +51,8 @@ def test_inline_fragment(
 ):
     fragment = InlineFragment(type=type, arguments=arguments, fields=fields, typename=typename)
     assert fragment.render() == result
+
+
+def test_empty_fields():
+    with pytest.raises(ValueError):
+        _ = InlineFragment(type="Type", fields=[])
