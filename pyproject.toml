@@ -8,6 +8,7 @@ path = "graphql_query/__version__.py"
 [project]
 name = "graphql_query"
 description = "Complete GraphQL query string generation for python."
+readme = "README.md"
 authors = [
     {name = "Denis A. Artyushin", email = "artyushinden@gmail.com"},
 ]
