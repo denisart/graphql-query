@@ -481,3 +481,8 @@ def test_operation(
     operation = Operation(type=type, name=name, variables=variables, queries=queries, fragments=fragments)
 
     assert operation.render() == result
+
+
+def test_empty_queries_list():
+    with pytest.raises(ValueError):
+        _ = Operation(type="query", queries=[])

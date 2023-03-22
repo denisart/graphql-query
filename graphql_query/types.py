@@ -194,10 +194,6 @@ class Argument(_GraphQL2PythonQuery):
         return all(isinstance(value, str) for value in values)
 
     @staticmethod
-    def _check_is_list_of_int(values: List[Any]) -> TypeGuard[List[int]]:
-        return all(isinstance(value, Argument) for value in values)
-
-    @staticmethod
     def _check_is_list_of_arguments(values: List[Any]) -> TypeGuard[List['Argument']]:
         return all(isinstance(value, Argument) for value in values)
 
@@ -216,9 +212,6 @@ class Argument(_GraphQL2PythonQuery):
 
     def _render_for_list_str(self, name: str, value: List[str]) -> str:
         return self._template_key_values.render(name=name, values=value)
-
-    def _render_for_list_int(self, name: str, value: List[int]) -> str:
-        return self._template_key_values.render(name=name, values=[str(v) for v in value])
 
     def _render_for_list_argument(self, name: str, value: List['Argument']) -> str:
         return self._template_key_arguments.render(
@@ -255,9 +248,6 @@ class Argument(_GraphQL2PythonQuery):
 
             if self._check_is_list_of_arguments(self.value):
                 return self._render_for_list_argument(self.name, self.value)
-
-            if self._check_is_list_of_int(self.value):
-                return self._render_for_list_int(self.name, self.value)
 
             if self._check_is_list_of_list(self.value):
                 if all(self._check_is_list_of_arguments(v) for v in self.value):
@@ -513,14 +503,6 @@ class Fragment(_GraphQL2PythonQuery):
     def graphql_fragment_name(cls, name: str) -> str:
         return assert_name(name)
 
-    @validator("fields")
-    def graphql_fragment_fields(
-        cls, fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
-    ) -> List[Union[str, 'Field', 'InlineFragment', 'Fragment']]:
-        if len(fields) == 0:
-            raise ValueError("empty fields for this fragment")
-        return fields
-
     def render(self) -> str:
         return self._template.render(
             name=self.name,
@@ -585,14 +567,6 @@ class Query(_GraphQL2PythonQuery):
         if alias is not None:
             return assert_name(alias)
         return alias
-
-    @validator("fields")
-    def graphql_query_fields(
-        cls, fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
-    ) -> List[Union[str, 'Field', 'InlineFragment', 'Fragment']]:
-        if len(fields) == 0:
-            raise ValueError("empty fields for this query")
-        return fields
 
     def render(self) -> str:
         return self._template.render(
