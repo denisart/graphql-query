@@ -7,9 +7,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'graphql_query'
-copyright = '2022, Denis A. Artyushin'
+copyright = '2022-2023, Denis A. Artyushin'
 author = 'Denis A. Artyushin'
-version = '1.0.1'
+version = '1.0.3'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
