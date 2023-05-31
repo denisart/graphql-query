@@ -3,11 +3,9 @@ import sys
 from pathlib import Path
 from typing import Any, List, Optional, Union
 
-from graphql import assert_name
 from jinja2 import Environment, FileSystemLoader, Template
 from pydantic import BaseModel
 from pydantic import Field as PydanticField
-from pydantic import validator
 
 if sys.version_info >= (3, 10):
     from typing import TypeGuard
@@ -97,10 +95,6 @@ class Variable(_GraphQL2PythonQuery):
 
     _template: Template = template_env.get_template("variable.jinja2")
 
-    @validator("name")
-    def graphql_variable_name(cls, name: str) -> str:
-        return assert_name(name)
-
     def render(self) -> str:
         return self._template.render(name=self.name, type=self.type, default=self.default)
 
@@ -184,10 +178,6 @@ class Argument(_GraphQL2PythonQuery):
     _template_key_variable: Template = template_env.get_template("argument_key_variable.jinja2")
     _template_key_arguments: Template = template_env.get_template("argument_key_arguments.jinja2")
     _template_key_objects: Template = template_env.get_template("argument_key_objects.jinja2")
-
-    @validator("name")
-    def graphql_argument_name(cls, name: str) -> str:
-        return assert_name(name)
 
     @staticmethod
     def _check_is_list_of_str(values: List[Any]) -> TypeGuard[List[str]]:
@@ -297,10 +287,6 @@ class Directive(_GraphQL2PythonQuery):
 
     _template_directive: Template = template_env.get_template("directive.jinja2")
 
-    @validator("name")
-    def graphql_directive_name(cls, name: str) -> str:
-        return assert_name(name)
-
     def render(self) -> str:
         return self._template_directive.render(
             name=self.name, arguments=[self._line_shift(argument.render()) for argument in self.arguments]
@@ -367,16 +353,6 @@ class Field(_GraphQL2PythonQuery):
 
     _template: Template = template_env.get_template("field.jinja2")
 
-    @validator("name")
-    def graphql_field_name(cls, name: str) -> str:
-        return assert_name(name)
-
-    @validator("alias")
-    def graphql_field_alias(cls, alias: Optional[str]) -> Optional[str]:
-        if alias is not None:
-            return assert_name(alias)
-        return alias
-
     def render(self) -> str:
         return self._template.render(
             name=self.name,
@@ -430,14 +406,6 @@ class InlineFragment(_GraphQL2PythonQuery):
     typename: bool = PydanticField(default=False, description="Add meta field `__typename` to sub-fields.")
 
     _template: Template = template_env.get_template("inline_fragment.jinja2")
-
-    @validator("fields")
-    def graphql_inline_fragment_fields(
-        cls, fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']]
-    ) -> List[Union[str, 'Field', 'InlineFragment', 'Fragment']]:
-        if len(fields) == 0:
-            raise ValueError("empty fields for this inline fragment")
-        return fields
 
     def render(self) -> str:
         return self._template.render(
@@ -499,10 +467,6 @@ class Fragment(_GraphQL2PythonQuery):
 
     _template: Template = template_env.get_template("fragment.jinja2")
 
-    @validator("name")
-    def graphql_fragment_name(cls, name: str) -> str:
-        return assert_name(name)
-
     def render(self) -> str:
         return self._template.render(
             name=self.name,
@@ -557,16 +521,6 @@ class Query(_GraphQL2PythonQuery):
     fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
 
     _template: Template = template_env.get_template("query.jinja2")
-
-    @validator("name")
-    def graphql_query_name(cls, name: str) -> str:
-        return assert_name(name)
-
-    @validator("alias")
-    def graphql_alias_alias(cls, alias: Optional[str]) -> Optional[str]:
-        if alias is not None:
-            return assert_name(alias)
-        return alias
 
     def render(self) -> str:
         return self._template.render(
@@ -638,18 +592,6 @@ class Operation(_GraphQL2PythonQuery):
 
     _template: Template = template_env.get_template("operation.jinja2")
     _supported_types = ["query", "mutation", "subscription"]
-
-    @validator("name")
-    def graphql_operation_name(cls, name: Optional[str]) -> Optional[str]:
-        if name is not None:
-            return assert_name(name)
-        return name
-
-    @validator("queries")
-    def graphql_queries(cls, queries: List[Query]) -> List[Query]:
-        if len(queries) == 0:
-            raise ValueError("empty queries list for this operation")
-        return queries
 
     def render(self) -> str:
         return self._template.render(
