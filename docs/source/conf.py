@@ -9,7 +9,7 @@
 project = 'graphql_query'
 copyright = '2022-2023, Denis A. Artyushin'
 author = 'Denis A. Artyushin'
-version = '1.0.3'
+version = '1.1.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
