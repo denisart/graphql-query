@@ -91,7 +91,7 @@ class Variable(_GraphQL2PythonQuery):
 
     name: str
     type: str
-    default: Optional[str] = PydanticField(default=None)
+    default: str | None = PydanticField(default=None)
 
     _template: Template = template_env.get_template("variable.jinja2")
 
