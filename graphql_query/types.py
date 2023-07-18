@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Any, List, Optional, Union
 
 from jinja2 import Environment, FileSystemLoader, Template
-from pydantic import BaseModel
-from pydantic import Field as PydanticField
+from pydantic.v1 import BaseModel
+from pydantic.v1 import Field as PydanticField
 
 if sys.version_info >= (3, 10):
     from typing import TypeGuard
