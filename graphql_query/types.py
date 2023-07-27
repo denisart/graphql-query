@@ -1,11 +1,24 @@
-import os
 import sys
-from pathlib import Path
 from typing import Any, List, Optional, Union
 
-from jinja2 import Environment, FileSystemLoader, Template
-from pydantic import BaseModel
+from pydantic import BaseModel as PydanticBaseModel
 from pydantic import Field as PydanticField
+
+from .templates import (
+    _template_key_value,
+    _template_key_values,
+    _template_key_argument,
+    _template_key_variable,
+    _template_key_arguments,
+    _template_key_objects,
+    _template_directive,
+    _template_variable,
+    _template_operation,
+    _template_query,
+    _template_fragment,
+    _template_inline_fragment,
+    _template_field,
+)
 
 if sys.version_info >= (3, 10):
     from typing import TypeGuard
@@ -25,21 +38,12 @@ __all__ = [
 ]
 
 
-# templates setting for render of classes
-TEMPLATES_FOLDER = Path(os.path.join(os.path.dirname(__file__), "templates/"))
-
-template_env = Environment(loader=FileSystemLoader(searchpath=TEMPLATES_FOLDER))
-
-
-class _GraphQL2PythonQuery(BaseModel):
+class _GraphQL2PythonQuery(PydanticBaseModel):
     """An abstract class for GraphQL query type."""
 
     class Config:
-        # pylint: disable=too-few-public-methods
-        smart_union = True
         extra = "forbid"
         arbitrary_types_allowed = True
-        allow_reuse = True
 
     @staticmethod
     def _line_shift(text: str) -> str:
@@ -93,14 +97,12 @@ class Variable(_GraphQL2PythonQuery):
     type: str
     default: Optional[str] = PydanticField(default=None)
 
-    _template: Template = template_env.get_template("variable.jinja2")
-
     def render(self) -> str:
-        return self._template.render(name=self.name, type=self.type, default=self.default)
+        return _template_variable.render(name=self.name, type=self.type, default=self.default)
 
 
 class Argument(_GraphQL2PythonQuery):
-    """GraphQL argument type.
+    """GraphQL Argument type.
 
     See https://graphql.org/learn/queries/#arguments for more details.
 
@@ -164,24 +166,27 @@ class Argument(_GraphQL2PythonQuery):
     value: Union[
         str,
         int,
+        bool,
         'Argument',
         Variable,
         List[str],
         List[int],
+        List[bool],
         List['Argument'],
         List[List['Argument']],
     ]
 
-    _template_key_value: Template = template_env.get_template("argument_key_value.jinja2")
-    _template_key_values: Template = template_env.get_template("argument_key_values.jinja2")
-    _template_key_argument: Template = template_env.get_template("argument_key_argument.jinja2")
-    _template_key_variable: Template = template_env.get_template("argument_key_variable.jinja2")
-    _template_key_arguments: Template = template_env.get_template("argument_key_arguments.jinja2")
-    _template_key_objects: Template = template_env.get_template("argument_key_objects.jinja2")
-
     @staticmethod
     def _check_is_list_of_str(values: List[Any]) -> TypeGuard[List[str]]:
         return all(isinstance(value, str) for value in values)
+
+    @staticmethod
+    def _check_is_list_of_int(values: List[Any]) -> TypeGuard[List[int]]:
+        return all(isinstance(value, int) for value in values)
+
+    @staticmethod
+    def _check_is_list_of_bool(values: List[Any]) -> TypeGuard[List[bool]]:
+        return all(isinstance(value, bool) for value in values)
 
     @staticmethod
     def _check_is_list_of_arguments(values: List[Any]) -> TypeGuard[List['Argument']]:
@@ -191,37 +196,48 @@ class Argument(_GraphQL2PythonQuery):
     def _check_is_list_of_list(values: List[Any]) -> TypeGuard[List[List[Any]]]:
         return all(isinstance(value, list) for value in values)
 
-    def _render_for_str(self, name: str, value: str) -> str:
-        return self._template_key_value.render(name=name, value=value)
+    @staticmethod
+    def _render_for_str(name: str, value: str) -> str:
+        return _template_key_value.render(name=name, value=value)
 
-    def _render_for_int(self, name: str, value: int) -> str:
-        return self._template_key_value.render(name=name, value=str(value))
+    @staticmethod
+    def _render_for_int(name: str, value: int) -> str:
+        return _template_key_value.render(name=name, value=str(value))
+
+    @staticmethod
+    def _render_for_list_str(name: str, value: List[str]) -> str:
+        return _template_key_values.render(name=name, values=value)
+
+    @staticmethod
+    def _render_for_list_bool(name: str, value: List[bool]) -> str:
+        return _template_key_values.render(name=name, values=[str(v).lower() for v in value])
+
+    @staticmethod
+    def _render_for_variable(name: str, value: Variable) -> str:
+        return _template_key_variable.render(name=name, value=value.name)
 
     def _render_for_argument(self, name: str, value: 'Argument') -> str:
-        return self._template_key_argument.render(name=name, argument=self._line_shift(value.render()))
-
-    def _render_for_list_str(self, name: str, value: List[str]) -> str:
-        return self._template_key_values.render(name=name, values=value)
+        return _template_key_argument.render(name=name, argument=self._line_shift(value.render()))
 
     def _render_for_list_argument(self, name: str, value: List['Argument']) -> str:
-        return self._template_key_arguments.render(
+        return _template_key_arguments.render(
             name=name, arguments=[self._line_shift(argument.render()) for argument in value]
         )
 
     def _render_for_list_list_argument(self, name: str, value: List[List['Argument']]) -> str:
-        return self._template_key_objects.render(
+        return _template_key_objects.render(
             name=name,
             list_arguments=[
                 [self._line_shift(self._line_shift(argument.render())) for argument in arguments] for arguments in value
             ],
         )
 
-    def _render_for_variable(self, name: str, value: Variable) -> str:
-        return self._template_key_variable.render(name=name, value=value.name)
-
     def render(self) -> str:
         if isinstance(self.value, str):
             return self._render_for_str(self.name, self.value)
+
+        if isinstance(self.value, bool):
+            return self._render_for_str(self.name, str(self.value).lower())
 
         if isinstance(self.value, int):
             return self._render_for_int(self.name, self.value)
@@ -235,6 +251,12 @@ class Argument(_GraphQL2PythonQuery):
         if isinstance(self.value, list):
             if self._check_is_list_of_str(self.value):
                 return self._render_for_list_str(self.name, self.value)
+
+            if self._check_is_list_of_bool(self.value):
+                return self._render_for_list_bool(self.name, self.value)
+
+            if self._check_is_list_of_int(self.value):
+                return self._render_for_list_str(self.name, [str(v) for v in self.value])
 
             if self._check_is_list_of_arguments(self.value):
                 return self._render_for_list_argument(self.name, self.value)
@@ -285,11 +307,10 @@ class Directive(_GraphQL2PythonQuery):
     name: str
     arguments: List[Argument] = PydanticField(default_factory=list)
 
-    _template_directive: Template = template_env.get_template("directive.jinja2")
-
     def render(self) -> str:
-        return self._template_directive.render(
-            name=self.name, arguments=[self._line_shift(argument.render()) for argument in self.arguments]
+        return _template_directive.render(
+            name=self.name,
+            arguments=[self._line_shift(argument.render()) for argument in self.arguments],
         )
 
 
@@ -351,10 +372,8 @@ class Field(_GraphQL2PythonQuery):
     directives: List[Directive] = PydanticField(default_factory=list)
     typename: bool = PydanticField(default=False, description="Add meta field `__typename` to sub-fields.")
 
-    _template: Template = template_env.get_template("field.jinja2")
-
     def render(self) -> str:
-        return self._template.render(
+        return _template_field.render(
             name=self.name,
             alias=self.alias,
             arguments=[self._line_shift(argument.render()) for argument in self.arguments],
@@ -405,10 +424,8 @@ class InlineFragment(_GraphQL2PythonQuery):
     fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
     typename: bool = PydanticField(default=False, description="Add meta field `__typename` to sub-fields.")
 
-    _template: Template = template_env.get_template("inline_fragment.jinja2")
-
     def render(self) -> str:
-        return self._template.render(
+        return _template_inline_fragment.render(
             type=self.type,
             arguments=[self._line_shift(argument.render()) for argument in self.arguments],
             fields=[self._render_field(field) for field in self.fields],
@@ -465,10 +482,8 @@ class Fragment(_GraphQL2PythonQuery):
     fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
     typename: bool = PydanticField(default=False, description="Add meta field `__typename` to sub-fields")
 
-    _template: Template = template_env.get_template("fragment.jinja2")
-
     def render(self) -> str:
-        return self._template.render(
+        return _template_fragment.render(
             name=self.name,
             type=self.type,
             fields=[self._render_field(field) for field in self.fields],
@@ -520,10 +535,8 @@ class Query(_GraphQL2PythonQuery):
     typename: bool = PydanticField(default=False, description="Add meta field `__typename` to the query.")
     fields: List[Union[str, 'Field', 'InlineFragment', 'Fragment']] = PydanticField(default_factory=list)
 
-    _template: Template = template_env.get_template("query.jinja2")
-
     def render(self) -> str:
-        return self._template.render(
+        return _template_query.render(
             name=self.name,
             alias=self.alias,
             arguments=[self._line_shift(argument.render()) for argument in self.arguments],
@@ -533,7 +546,7 @@ class Query(_GraphQL2PythonQuery):
 
 
 class Operation(_GraphQL2PythonQuery):
-    """GraphQL operation type.
+    """GraphQL Operation type.
 
     See https://graphql.org/learn/queries/ for more details.
 
@@ -590,23 +603,11 @@ class Operation(_GraphQL2PythonQuery):
         default_factory=list, description="https://graphql.org/learn/queries/#fragments"
     )
 
-    _template: Template = template_env.get_template("operation.jinja2")
-    _supported_types = ["query", "mutation", "subscription"]
-
     def render(self) -> str:
-        return self._template.render(
+        return _template_operation.render(
             type=self.type,
             name=self.name,
             variables=[self._line_shift(variable.render()) for variable in self.variables],
             queries=[self._line_shift(query.render()) for query in self.queries],
             fragments=[fragment.render() for fragment in self.fragments],
         )
-
-
-Variable.update_forward_refs()
-Argument.update_forward_refs()
-Field.update_forward_refs()
-InlineFragment.update_forward_refs()
-Fragment.update_forward_refs()
-Query.update_forward_refs()
-Operation.update_forward_refs()

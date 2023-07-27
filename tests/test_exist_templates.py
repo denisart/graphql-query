@@ -1,7 +1,7 @@
 import pytest
 from jinja2 import Template
 
-from graphql_query.types import template_env
+from graphql_query.templates import template_env
 
 
 @pytest.mark.parametrize(
