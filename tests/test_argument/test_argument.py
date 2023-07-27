@@ -16,6 +16,11 @@ def test_value_is_int():
     assert Argument(name="length", value=-1).render() == 'length: -1'
 
 
+def test_value_is_bool():
+    assert Argument(name="some", value=True).render() == 'some: true'
+    assert Argument(name="some", value=False).render() == 'some: false'
+
+
 def test_value_is_list_str():
     assert Argument(name="someListArgument", value=['"123"']).render() == 'someListArgument: ["123"]'
     assert Argument(name="someListArgument", value=[]).render() == 'someListArgument: []'
@@ -26,6 +31,12 @@ def test_value_is_list_int():
     assert Argument(name="someListArgument", value=[123]).render() == 'someListArgument: [123]'
     assert Argument(name="someListArgument", value=[]).render() == 'someListArgument: []'
     assert Argument(name="someListArgument", value=[123, 456]).render() == 'someListArgument: [123, 456]'
+
+
+def test_value_is_list_bool():
+    assert Argument(name="someListArgument", value=[True, False]).render() == 'someListArgument: [true, false]'
+    assert Argument(name="someListArgument", value=[True]).render() == 'someListArgument: [true]'
+    assert Argument(name="someListArgument", value=[False]).render() == 'someListArgument: [false]'
 
 
 @pytest.mark.parametrize(
