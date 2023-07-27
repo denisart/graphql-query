@@ -13,7 +13,7 @@ Welcome to GRAPHQL_QUERY documentation!
 .. image:: https://img.shields.io/github/license/denisart/graphql-query
   :alt: license
 
-**graphql_query** is complete GraphQL query string builder for python. With **graphql_query**
+**graphql_query** is complete GraphQL query string builder for python (based on pydantic v2). With **graphql_query**
 you can
 
 - generate a GraphQL query string from a python class;
