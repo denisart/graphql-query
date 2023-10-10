@@ -167,11 +167,13 @@ class Argument(_GraphQL2PythonQuery):
         str,
         int,
         bool,
+        float,
         'Argument',
         Variable,
         List[str],
         List[int],
         List[bool],
+        List[float],
         List['Argument'],
         List[List['Argument']],
     ]
@@ -187,6 +189,10 @@ class Argument(_GraphQL2PythonQuery):
     @staticmethod
     def _check_is_list_of_bool(values: List[Any]) -> TypeGuard[List[bool]]:
         return all(isinstance(value, bool) for value in values)
+
+    @staticmethod
+    def _check_is_list_of_float(values: List[Any]) -> TypeGuard[List[float]]:
+        return all(isinstance(value, float) for value in values)
 
     @staticmethod
     def _check_is_list_of_arguments(values: List[Any]) -> TypeGuard[List['Argument']]:
@@ -205,11 +211,19 @@ class Argument(_GraphQL2PythonQuery):
         return _template_key_value.render(name=name, value=str(value))
 
     @staticmethod
+    def _render_for_float(name: str, value: float) -> str:
+        return _template_key_value.render(name=name, value=str(value))
+
+    @staticmethod
     def _render_for_list_str(name: str, value: List[str]) -> str:
         return _template_key_values.render(name=name, values=value)
 
     @staticmethod
     def _render_for_list_bool(name: str, value: List[bool]) -> str:
+        return _template_key_values.render(name=name, values=[str(v).lower() for v in value])
+
+    @staticmethod
+    def _render_for_list_float(name: str, value: List[float]) -> str:
         return _template_key_values.render(name=name, values=[str(v).lower() for v in value])
 
     @staticmethod
@@ -242,6 +256,9 @@ class Argument(_GraphQL2PythonQuery):
         if isinstance(self.value, int):
             return self._render_for_int(self.name, self.value)
 
+        if isinstance(self.value, float):
+            return self._render_for_float(self.name, self.value)
+
         if isinstance(self.value, Argument):
             return self._render_for_argument(self.name, self.value)
 
@@ -254,6 +271,9 @@ class Argument(_GraphQL2PythonQuery):
 
             if self._check_is_list_of_bool(self.value):
                 return self._render_for_list_bool(self.name, self.value)
+
+            if self._check_is_list_of_float(self.value):
+                return self._render_for_list_float(self.name, self.value)
 
             if self._check_is_list_of_int(self.value):
                 return self._render_for_list_str(self.name, [str(v) for v in self.value])

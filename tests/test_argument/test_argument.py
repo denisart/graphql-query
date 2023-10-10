@@ -21,6 +21,11 @@ def test_value_is_bool():
     assert Argument(name="some", value=False).render() == 'some: false'
 
 
+def test_value_is_float():
+    assert Argument(name="some", value=1.0).render() == 'some: 1.0'
+    assert Argument(name="some", value=0.2).render() == 'some: 0.2'
+
+
 def test_value_is_list_str():
     assert Argument(name="someListArgument", value=['"123"']).render() == 'someListArgument: ["123"]'
     assert Argument(name="someListArgument", value=[]).render() == 'someListArgument: []'
@@ -39,6 +44,11 @@ def test_value_is_list_bool():
     assert Argument(name="someListArgument", value=[False]).render() == 'someListArgument: [false]'
 
 
+def test_value_is_list_float():
+    assert Argument(name="someListArgument", value=[1.0, 0.2]).render() == 'someListArgument: [1.0, 0.2]'
+    assert Argument(name="someListArgument", value=[42.0]).render() == 'someListArgument: [42.0]'
+
+
 @pytest.mark.parametrize(
     "name, value, result",
     [
@@ -46,6 +56,7 @@ def test_value_is_list_bool():
         ("filter", Argument(name="field", value="VALUE"), "filter: {\n  field: VALUE\n}"),
         ("filter", Argument(name="field", value='"value"'), 'filter: {\n  field: "value"\n}'),
         ("filter", Argument(name="field", value=[123, -456]), "filter: {\n  field: [123, -456]\n}"),
+        ("filter", Argument(name="field", value=[42.000, -21.000001]), "filter: {\n  field: [42.0, -21.000001]\n}"),
         (
             "filter",
             Argument(name="field", value=['"value1"', '"value2"']),
