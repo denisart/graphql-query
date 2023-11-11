@@ -6,10 +6,10 @@
 
 ---
 
-**graphql_query** is complete GraphQL query string builder for python. With **graphql_query**
-you can
+**graphql_query** is a complete Domain Specific Language (DSL) for GraphQL query in python. With **graphql_query**
+you can to
 
-- generate a GraphQL query string from a python class;
+- generate a correct GraphQL query string from a python classes;
 - use and share similar Arguments, Variables and e.t.c between different queries;
 - easily add new fields to your query;
 - add Fragments and Directives to queries;
