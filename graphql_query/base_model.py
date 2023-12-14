@@ -12,11 +12,11 @@ def _get_field_template(field_info: PydanticFieldInfo) -> Field:
     directives: List[Directive] = []
     typename: bool = False
 
-    if (field_info.json_schema_extra is not None) and (type(field_info.json_schema_extra) is dict):
-        alias = field_info.json_schema_extra.get("graphql_alias", None)
-        arguments = field_info.json_schema_extra.get("graphql_arguments", [])
-        directives = field_info.json_schema_extra.get("graphql_directives", [])
-        typename = field_info.json_schema_extra.get("graphql_typename", False)
+    if (field_info.json_schema_extra is not None) and isinstance(field_info.json_schema_extra, dict):
+        alias = field_info.json_schema_extra.get("graphql_alias", None)  # type: ignore
+        arguments = field_info.json_schema_extra.get("graphql_arguments", [])  # type: ignore
+        directives = field_info.json_schema_extra.get("graphql_directives", [])  # type: ignore
+        typename = field_info.json_schema_extra.get("graphql_typename", False)  # type: ignore
 
     return Field(name="<NAME>", fields=[], alias=alias, arguments=arguments, directives=directives, typename=typename)
 
