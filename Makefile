@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := all
-sources = graphql_query/ tests/ docs/source
+sources = graphql_query/ tests/
 
 .PHONY: install
 install:
