@@ -1,0 +1,35 @@
+site_name: graphql-query
+site_description: Complete Domain Specific Language (DSL) for GraphQL query in Python.
+
+theme:
+    name: 'material'
+    palette:
+      primary: 'light blue'
+      accent: 'light blue'
+    analytics:
+      gtag: 275257853
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+
+repo_name: denisart/graphql-query
+repo_url: https://github.com/denisart/graphql-query
+site_url: https://denisart.github.io/graphql-query/
+
+nav:
+    - Overview: index.md
+    - Introduction: intro.md
+    - How to use: usage.md
+    - Usage Examples:
+        - List of Objects: list_of_objects.md
+        - With gql: with_gql.md
+
+plugins:
+  - search

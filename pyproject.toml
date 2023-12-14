@@ -67,10 +67,8 @@ test = [
 
 # all requirements for docs generation
 docs = [
-    "sphinx",
-    "sphinx_rtd_theme",
-    "sphinx-argparse",
-    "sphinxcontrib-github",
+    "mkdocs",
+    "mkdocs-material",
 ]
 
 [tool.ruff]
