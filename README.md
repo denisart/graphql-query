@@ -13,6 +13,7 @@ you can to
 - use and share similar Arguments, Variables and e.t.c between different queries;
 - easily add new fields to your query;
 - add Fragments and Directives to queries;
+- generate **graphql_query** classes from pydantic data-model;
 
 The documentation for **graphql_query** can be found at [https://denisart.github.io/graphql-query/](https://denisart.github.io/graphql-query/).
 

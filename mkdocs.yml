@@ -27,6 +27,7 @@ nav:
     - Overview: index.md
     - Introduction: intro.md
     - How to use: usage.md
+    - From pydantic: from_data_model.md
     - Usage Examples:
         - List of Objects: list_of_objects.md
         - With gql: with_gql.md
