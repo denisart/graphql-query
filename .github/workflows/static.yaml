@@ -36,12 +36,12 @@ jobs:
       - name: Build docs
         run: |
           python -m pip install -r requirements/requirements-docs.txt
-          cd docs && make html
+          mkdocs build --verbose --clean --strict
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
-          path: './docs/build/html/'
+          path: './site/'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
