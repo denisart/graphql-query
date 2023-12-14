@@ -5,19 +5,19 @@ from pydantic import BaseModel as PydanticBaseModel
 from pydantic import Field as PydanticField
 
 from .templates import (
-    _template_key_value,
-    _template_key_values,
-    _template_key_argument,
-    _template_key_variable,
-    _template_key_arguments,
-    _template_key_objects,
     _template_directive,
-    _template_variable,
-    _template_operation,
-    _template_query,
+    _template_field,
     _template_fragment,
     _template_inline_fragment,
-    _template_field,
+    _template_key_argument,
+    _template_key_arguments,
+    _template_key_objects,
+    _template_key_value,
+    _template_key_values,
+    _template_key_variable,
+    _template_operation,
+    _template_query,
+    _template_variable,
 )
 
 if sys.version_info >= (3, 10):
