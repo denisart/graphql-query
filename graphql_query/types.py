@@ -3,6 +3,7 @@ from typing import Any, List, Optional, Union
 
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import Field as PydanticField
+from pydantic import ConfigDict as PydanticConfigDict
 
 from .templates import (
     _template_directive,
@@ -41,9 +42,9 @@ __all__ = [
 class _GraphQL2PythonQuery(PydanticBaseModel):
     """An abstract class for GraphQL query type."""
 
-    class Config:
-        extra = "forbid"
-        arbitrary_types_allowed = True
+    model_config = PydanticConfigDict(
+        arbitrary_types_allowed=True,
+    )
 
     @staticmethod
     def _line_shift(text: str) -> str:

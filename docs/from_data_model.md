@@ -37,7 +37,11 @@ from graphql_query import Argument, Field, GraphQLQueryBaseModel
 
 class Human(GraphQLQueryBaseModel):
     name: str
-    height: float = PydanticField(graphql_arguments=[Argument(name="unit", value="FOOT")])
+    height: float = PydanticField(
+        json_schema_extra={
+            "graphql_arguments": [Argument(name="unit", value="FOOT")],
+        },
+    )
 
 generated = Human.graphql_fields()
 
