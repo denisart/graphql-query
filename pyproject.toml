@@ -7,36 +7,39 @@ path = "graphql_query/__version__.py"
 
 [project]
 name = "graphql_query"
-description = "Complete GraphQL query string generation for python."
+description = "Complete Domain Specific Language (DSL) for GraphQL query in Python."
 readme = "README.md"
 authors = [
     {name = "Denis A. Artyushin", email = "artyushinden@gmail.com"},
 ]
 keywords = [
-    "python", "graphql", "graphql-query",
+    "python", "graphql", "graphql-query", "dsl",
     "query-builder", "code-generation", "codegen",
-    "query-generator", "graphql-query-builder", "query-generation",
+    "query-generator", "pydantic", "graphql-query-builder",
+    "query-generation",
 ]
 license = "MIT"
+# list of classifiers
+# https://pypi.org/classifiers/
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
-    "Operating System :: Unix",
-    "Operating System :: POSIX :: Linux",
-    "Environment :: Console",
+    "Operating System :: OS Independent",
     "Environment :: MacOS X",
     "Framework :: Pydantic",
+    "Framework :: Pydantic :: 2",
+    "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
     "pydantic>=2",
     "jinja2>=3.1, <3.2",
@@ -49,7 +52,7 @@ Documentation = "https://denisart.github.io/graphql-query/"
 Source = "https://github.com/denisart/graphql-query"
 
 [project.optional-dependencies]
-# all requirements for linting, building and etc.
+# all requirements for linting, building e.t.c.
 dev = [
     "mypy",
     "ruff",
@@ -76,7 +79,7 @@ line-length = 120
 flake8-quotes = {inline-quotes = 'single', multiline-quotes = 'double'}
 mccabe = { max-complexity = 14 }
 isort = { known-first-party = ['graphql_core', 'tests'] }
-target-version = "py37"
+target-version = "py38"
 
 [tool.black]
 color = true
