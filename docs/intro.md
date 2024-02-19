@@ -7,7 +7,7 @@
 For install you can to use **pip** with the following command
 
 ```bash
-pip install graphql-query
+pip install graphql_query
 ```
 
 After installation, you can start using GRAPHQL_QUERY by importing from the top-level graphql_query package.

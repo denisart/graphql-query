@@ -2,12 +2,12 @@
 
 **graphql_query** provides special python classes for generate of GraphQL queries.
 Below are examples of using these classes for queries from GraphQL documentation
-https://graphql.org/learn/queries/
+[https://graphql.org/learn/queries/](https://graphql.org/learn/queries/)
 
 ## First query
 
 **Operation** it is the general class for render of your GraphQL query or mutation.
-For the first query from https://graphql.org/learn/queries/#fields
+For the first query from [https://graphql.org/learn/queries/#fields](https://graphql.org/learn/queries/#fields)
 
 ```graphql
 {
@@ -80,7 +80,7 @@ query {
 
 ## Arguments
 
-For arguments in your query or fields (https://graphql.org/learn/queries/#arguments)
+For arguments in your query or fields ([https://graphql.org/learn/queries/#arguments](https://graphql.org/learn/queries/#arguments))
 you can use **graphql_query.Argument**:
 
 ```python
@@ -425,7 +425,7 @@ mutation CreateReviewForEpisode(
 
 ## Inline Fragments
 
-For union types you can use inline fragments https://graphql.org/learn/queries/#inline-fragments
+For union types you can use inline fragments [https://graphql.org/learn/queries/#inline-fragments](https://graphql.org/learn/queries/#inline-fragments)
 
 ```python
 from graphql_query import Argument, Operation, Query, Variable, InlineFragment
