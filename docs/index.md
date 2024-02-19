@@ -1,4 +1,4 @@
-# GraphQL-Query
+# graphql-query
 
 [![tag](https://img.shields.io/github/v/tag/denisart/graphql-query)](https://github.com/denisart/graphql-query)
 [![last-commit](https://img.shields.io/github/last-commit/denisart/graphql-query/master)](https://github.com/denisart/graphql-query/commits/master)
@@ -6,7 +6,7 @@
 
 ---
 
-**graphql_query** is a complete Domain Specific Language (DSL) for GraphQL query in python. With **graphql_query**
+**graphql_query** is a complete Domain Specific Language (DSL) for GraphQL query in Python. With this package
 you can to
 
 - generate a correct GraphQL query string from a python classes;
@@ -78,7 +78,7 @@ query Hero($episode: Episode, $withFriends: Boolean!) {
 }
 ```
 
-we have
+we can use the following python code
 
 ```python
 from graphql_query import Argument, Directive, Field, Operation, Query, Variable
