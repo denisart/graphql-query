@@ -2,6 +2,7 @@
 
 [![tag](https://img.shields.io/github/v/tag/denisart/graphql-query)](https://github.com/denisart/graphql-query)
 [![last-commit](https://img.shields.io/github/last-commit/denisart/graphql-query/master)](https://github.com/denisart/graphql-query/commits/master)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/graphql-query)](https://pypi.python.org/pypi/graphql-query)
 [![license](https://img.shields.io/github/license/denisart/graphql-query)](https://github.com/denisart/graphql-query/blob/master/LICENSE)
 
 ---
