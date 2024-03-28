@@ -7,7 +7,8 @@ theme:
       primary: 'light blue'
       accent: 'light blue'
     analytics:
-      gtag: 275257853
+      provider: google
+      property: G-FNZ7VNZWD7
 
 markdown_extensions:
   - pymdownx.highlight:
