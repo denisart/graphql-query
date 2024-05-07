@@ -1,15 +1,3 @@
-# =======================================================================
-#
-# Copyright (c) 2020-2023 Northern Capital Gateway, LLC. All rights reserved.
-#
-# This software is the confidential and proprietary information of
-# Northern Capital Gateway, LLC.
-# You shall not disclose such Confidential Information and shall use it only in
-# accordance with the terms of the license agreement you entered into with
-# Northern Capital Gateway, LLC
-#
-# =======================================================================
-
 import os
 from pathlib import Path
 
