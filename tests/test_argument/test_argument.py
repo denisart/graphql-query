@@ -26,10 +26,21 @@ def test_value_is_float():
     assert Argument(name="some", value=0.2).render() == 'some: 0.2'
 
 
-def test_value_is_list_str():
+def test_value_is_list_str_with_backward_compatible_workarounds():
     assert Argument(name="someListArgument", value=['"123"']).render() == 'someListArgument: ["123"]'
     assert Argument(name="someListArgument", value=[]).render() == 'someListArgument: []'
     assert Argument(name="someListArgument", value=['"123", "456"']).render() == 'someListArgument: ["123", "456"]'
+
+
+def test_value_is_list_str():
+    assert Argument(name="someListArgument", value=["123", "456"]).render() == 'someListArgument: ["123", "456"]'
+    assert Argument(name="someListArgument",
+                    value=["hello", "world"]).render() == 'someListArgument: ["hello", "world"]'
+
+
+def test_value_is_list_str_with_apostrophe():
+    assert Argument(name="someListArgument",
+                    value=["you'r", "isn't"]).render() == 'someListArgument: ["you\'r", "isn\'t"]'
 
 
 def test_value_is_list_int():

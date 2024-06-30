@@ -217,7 +217,20 @@ class Argument(_GraphQL2PythonQuery):
 
     @staticmethod
     def _render_for_list_str(name: str, value: List[str]) -> str:
-        return _template_key_values.render(name=name, values=value)
+        clean_list = []
+        for item in value:
+            result = item.replace('"', '').split(',')
+            if type(result) is list:
+                trimmed_result = [i.strip() for i in result]
+                clean_list.extend(trimmed_result)
+            else:
+                clean_list.append(result)
+
+        return _template_key_values.render(name=name, values=[f"\"{v.replace('"', '')}\"" for v in clean_list])
+
+    @staticmethod
+    def _render_for_list_int(name: str, value: List[str]) -> str:
+        return _template_key_values.render(name=name, values=[str(v) for v in value])
 
     @staticmethod
     def _render_for_list_bool(name: str, value: List[bool]) -> str:
@@ -277,7 +290,7 @@ class Argument(_GraphQL2PythonQuery):
                 return self._render_for_list_float(self.name, self.value)
 
             if self._check_is_list_of_int(self.value):
-                return self._render_for_list_str(self.name, [str(v) for v in self.value])
+                return self._render_for_list_int(self.name, self.value)
 
             if self._check_is_list_of_arguments(self.value):
                 return self._render_for_list_argument(self.name, self.value)
