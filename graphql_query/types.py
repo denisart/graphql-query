@@ -220,7 +220,7 @@ class Argument(_GraphQL2PythonQuery):
         clean_list = []
         for item in value:
             result = item.replace('"', '').split(',')
-            if type(result) is list:
+            if isinstance(result, list):
                 trimmed_result = [i.strip() for i in result]
                 clean_list.extend(trimmed_result)
             else:
