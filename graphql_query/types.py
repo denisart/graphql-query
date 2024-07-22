@@ -226,7 +226,7 @@ class Argument(_GraphQL2PythonQuery):
             else:
                 clean_list.append(result)
 
-        return _template_key_values.render(name=name, values=[f"\"{v.replace('"', '')}\"" for v in clean_list])
+        return _template_key_values.render(name=name, values=[f'''\"{v.replace('"', '')}\"''' for v in clean_list])
 
     @staticmethod
     def _render_for_list_int(name: str, value: List[int]) -> str:
