@@ -6,47 +6,60 @@ from graphql_query import Argument, Variable
 def test_value_is_str():
     assert Argument(name="arg1", value="VALUE1").render() == "arg1: VALUE1"
     assert Argument(name="id", value='"1000"').render() == 'id: "1000"'
-    assert Argument(name="length", value='911').render() == 'length: 911'
+    assert Argument(name="length", value="911").render() == "length: 911"
     assert Argument(name="unit", value="null").render() == "unit: null"
 
 
 def test_value_is_int():
-    assert Argument(name="length", value=911).render() == 'length: 911'
-    assert Argument(name="length", value=0).render() == 'length: 0'
-    assert Argument(name="length", value=-1).render() == 'length: -1'
+    assert Argument(name="length", value=911).render() == "length: 911"
+    assert Argument(name="length", value=0).render() == "length: 0"
+    assert Argument(name="length", value=-1).render() == "length: -1"
 
 
 def test_value_is_bool():
-    assert Argument(name="some", value=True).render() == 'some: true'
-    assert Argument(name="some", value=False).render() == 'some: false'
+    assert Argument(name="some", value=True).render() == "some: true"
+    assert Argument(name="some", value=False).render() == "some: false"
 
 
 def test_value_is_float():
-    assert Argument(name="some", value=1.0).render() == 'some: 1.0'
-    assert Argument(name="some", value=0.2).render() == 'some: 0.2'
+    assert Argument(name="some", value=1.0).render() == "some: 1.0"
+    assert Argument(name="some", value=0.2).render() == "some: 0.2"
 
 
-def test_value_is_list_str():
+def test_value_is_list_str_with_backward_compatible_workarounds():
     assert Argument(name="someListArgument", value=['"123"']).render() == 'someListArgument: ["123"]'
-    assert Argument(name="someListArgument", value=[]).render() == 'someListArgument: []'
+    assert Argument(name="someListArgument", value=[]).render() == "someListArgument: []"
     assert Argument(name="someListArgument", value=['"123", "456"']).render() == 'someListArgument: ["123", "456"]'
 
 
+def test_value_is_list_str():
+    assert Argument(name="someListArgument", value=["123", "456"]).render() == 'someListArgument: ["123", "456"]'
+    assert (
+        Argument(name="someListArgument", value=["hello", "world"]).render() == 'someListArgument: ["hello", "world"]'
+    )
+
+
+def test_value_is_list_str_with_apostrophe():
+    assert (
+        Argument(name="someListArgument", value=["you'r", "isn't"]).render() == 'someListArgument: ["you\'r", "isn\'t"]'
+    )
+
+
 def test_value_is_list_int():
-    assert Argument(name="someListArgument", value=[123]).render() == 'someListArgument: [123]'
-    assert Argument(name="someListArgument", value=[]).render() == 'someListArgument: []'
-    assert Argument(name="someListArgument", value=[123, 456]).render() == 'someListArgument: [123, 456]'
+    assert Argument(name="someListArgument", value=[123]).render() == "someListArgument: [123]"
+    assert Argument(name="someListArgument", value=[]).render() == "someListArgument: []"
+    assert Argument(name="someListArgument", value=[123, 456]).render() == "someListArgument: [123, 456]"
 
 
 def test_value_is_list_bool():
-    assert Argument(name="someListArgument", value=[True, False]).render() == 'someListArgument: [true, false]'
-    assert Argument(name="someListArgument", value=[True]).render() == 'someListArgument: [true]'
-    assert Argument(name="someListArgument", value=[False]).render() == 'someListArgument: [false]'
+    assert Argument(name="someListArgument", value=[True, False]).render() == "someListArgument: [true, false]"
+    assert Argument(name="someListArgument", value=[True]).render() == "someListArgument: [true]"
+    assert Argument(name="someListArgument", value=[False]).render() == "someListArgument: [false]"
 
 
 def test_value_is_list_float():
-    assert Argument(name="someListArgument", value=[1.0, 0.2]).render() == 'someListArgument: [1.0, 0.2]'
-    assert Argument(name="someListArgument", value=[42.0]).render() == 'someListArgument: [42.0]'
+    assert Argument(name="someListArgument", value=[1.0, 0.2]).render() == "someListArgument: [1.0, 0.2]"
+    assert Argument(name="someListArgument", value=[42.0]).render() == "someListArgument: [42.0]"
 
 
 @pytest.mark.parametrize(
@@ -62,7 +75,7 @@ def test_value_is_list_float():
             Argument(name="field", value=['"value1"', '"value2"']),
             'filter: {\n  field: ["value1", "value2"]\n}',
         ),
-        ("filter", Argument(name="field", value=Variable(name="var", type="Variable")), 'filter: {\n  field: $var\n}'),
+        ("filter", Argument(name="field", value=Variable(name="var", type="Variable")), "filter: {\n  field: $var\n}"),
     ],
 )
 def test_value_is_argument(name: str, value: Argument, result: str):
@@ -73,7 +86,7 @@ def test_value_is_argument(name: str, value: Argument, result: str):
 def test_value_is_variable():
     var = Variable(name="var", type="Variable")
     arg = Argument(name="field", value=var)
-    assert arg.render() == 'field: $var'
+    assert arg.render() == "field: $var"
 
 
 def test_value_is_list_of_args():
