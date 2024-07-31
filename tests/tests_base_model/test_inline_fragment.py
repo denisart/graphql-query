@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 
 from graphql_query import Field, GraphQLQueryBaseModel, InlineFragment
 
@@ -13,11 +13,19 @@ def test_inline_fragments():
     class Hero(GraphQLQueryBaseModel):
         name: str
         type: Union[Human, Droid]
+        types: List[Union[Human, Droid]]
 
     correct = [
         Field(name="name", fields=[]),
         Field(
             name="type",
+            fields=[
+                InlineFragment(type="Human", fields=[Field(name="height", fields=[])]),
+                InlineFragment(type="Droid", fields=[Field(name="primaryFunction", fields=[])]),
+            ],
+        ),
+        Field(
+            name="types",
             fields=[
                 InlineFragment(type="Human", fields=[Field(name="height", fields=[])]),
                 InlineFragment(type="Droid", fields=[Field(name="primaryFunction", fields=[])]),
@@ -32,6 +40,14 @@ def test_inline_fragments():
         == """hero {
   name
   type {
+    ... on Human {
+      height
+    }
+    ... on Droid {
+      primaryFunction
+    }
+  }
+  types {
     ... on Human {
       height
     }

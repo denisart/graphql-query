@@ -38,7 +38,20 @@ def _get_fields(model: Type['GraphQLQueryBaseModel']) -> List[Union[str, Field, 
             list_args = get_args(f.annotation)[0]
 
             _field_template.name = f_name
-            _field_template.fields = _get_fields(list_args)
+
+            if get_origin(list_args) is Union:
+                union_args = [union_arg for union_arg in get_args(list_args) if union_arg is not type(None)]
+
+                if len(union_args) == 1:
+                    _field_template.fields = _get_fields(union_args[0])
+
+                else:
+                    _field_template.fields = [
+                        InlineFragment(type=union_arg.__name__, fields=_get_fields(union_arg))
+                        for union_arg in union_args
+                    ]
+            else:
+                _field_template.fields = _get_fields(list_args)
 
         #
         # union type
