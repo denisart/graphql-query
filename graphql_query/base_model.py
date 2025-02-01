@@ -21,7 +21,7 @@ def _get_field_template(field_info: PydanticFieldInfo) -> Field:
     return Field(name="<NAME>", fields=[], alias=alias, arguments=arguments, directives=directives, typename=typename)
 
 
-def _get_fields(model: Type['GraphQLQueryBaseModel']) -> List[Union[str, Field, InlineFragment, Fragment]]:
+def _get_fields(model: Type["GraphQLQueryBaseModel"]) -> List[Union[str, Field, InlineFragment, Fragment]]:
     fields: List[Union[str, Field, InlineFragment, Fragment]] = []
 
     for f_name, f in model.model_fields.items():
@@ -50,7 +50,7 @@ def _get_fields(model: Type['GraphQLQueryBaseModel']) -> List[Union[str, Field, 
                         InlineFragment(type=union_arg.__name__, fields=_get_fields(union_arg))
                         for union_arg in union_args
                     ]
-            else:
+            elif issubclass(list_args, GraphQLQueryBaseModel):
                 _field_template.fields = _get_fields(list_args)
 
         #
